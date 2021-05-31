@@ -37,6 +37,8 @@ dependencies {
     implementation("com.querydsl:querydsl-core:4.4.0")
     implementation("com.querydsl:querydsl-jpa:4.4.0")
 
+    implementation("io.github.cube8540:validator-core:1.2.0-RELEASE")
+
     runtimeOnly("com.h2database:h2")
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
 
