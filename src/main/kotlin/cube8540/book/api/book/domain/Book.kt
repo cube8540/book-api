@@ -22,7 +22,11 @@ class Book(
     var title: String,
 
     @Column(name = "publish_date")
-    var publishDate: LocalDate
+    var publishDate: LocalDate,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "publisher_code", nullable = false)
+    var publisher: Publisher
 
 ): AbstractAggregateRoot<Book>() {
 
@@ -32,10 +36,6 @@ class Book(
 
     @Embedded
     var series: Series? = null
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "publisher_code", nullable = false)
-    var publisher: Publisher? = null
 
     @Embedded
     var thumbnail: BookThumbnail? = null
@@ -65,6 +65,39 @@ class Book(
     @PostLoad
     fun markingPersistedEntity() {
         this.newObject = false
+    }
+
+    fun mergeBook(book: Book) {
+        this.title = book.title
+        this.publishDate = book.publishDate
+
+        book.description?.let { this.description = it }
+        book.price?.let { this.price = it }
+
+        if (this.series != null && book.series != null) {
+            this.series!!.mergeSeries(book.series!!)
+        } else if (book.series != null) {
+            this.series = book.series
+        }
+
+        if (this.thumbnail != null && book.thumbnail != null) {
+            this.thumbnail!!.mergeThumbnail(book.thumbnail!!)
+        } else if (book.thumbnail != null) {
+            this.thumbnail = book.thumbnail
+        }
+
+        if (this.authors != null && book.authors != null && book.authors!!.isNotEmpty()) {
+            this.authors!!.addAll(book.authors!!)
+        } else if (book.authors != null && book.authors!!.isNotEmpty()) {
+            this.authors = book.authors
+        }
+
+        this.updatedAt = LocalDateTime.now(clock)
+    }
+
+    @Transient
+    fun isValid(validatorFactory: BookValidatorFactory) {
+        validatorFactory.createValidator(this).result.hasErrorThrows { BookInvalidException.instance(it) }
     }
 
     override fun equals(other: Any?): Boolean = when (other) {

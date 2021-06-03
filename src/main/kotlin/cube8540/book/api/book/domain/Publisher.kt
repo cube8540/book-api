@@ -14,6 +14,10 @@ class Publisher(codeGenerator: PublisherCodeGenerator) {
 
     companion object {
         internal var clock = Clock.system(BookApiApplication.DEFAULT_TIME_ZONE.toZoneId())
+
+        fun fake(code: String) = Publisher(object: PublisherCodeGenerator {
+            override fun generateCode(): String = code
+        })
     }
 
     @Id
