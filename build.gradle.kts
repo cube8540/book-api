@@ -37,10 +37,14 @@ dependencies {
     implementation("com.querydsl:querydsl-core:4.4.0")
     implementation("com.querydsl:querydsl-jpa:4.4.0")
 
+    implementation("org.apache.commons:commons-text:1.8")
     implementation("io.github.cube8540:validator-core:1.2.0-RELEASE")
 
     runtimeOnly("com.h2database:h2")
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
+
+    implementation("com.navercorp.lucy:lucy-xss-servlet:2.0.1")
+    implementation("com.navercorp.lucy:lucy-xss:1.6.3")
 
     testImplementation("io.mockk:mockk:1.10.6")
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
