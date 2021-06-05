@@ -1,9 +1,25 @@
 package cube8540.book.api.book.application
 
+import java.beans.ConstructorProperties
 import java.net.URI
 import java.time.LocalDate
 
-data class BookPostRequest constructor(
+data class BookPostRequest
+@ConstructorProperties(value = [
+    "isbn",
+    "title",
+    "publishDate",
+    "publisherCode",
+    "seriesIsbn",
+    "seriesCode",
+    "largeThumbnail",
+    "mediumThumbnail",
+    "smallThumbnail",
+    "authors",
+    "description",
+    "price"
+])
+constructor(
     val isbn: String,
 
     val title: String,
