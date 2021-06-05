@@ -5,8 +5,7 @@ import cube8540.book.api.book.repository.BookRepository
 import io.github.cube8540.validator.core.ValidationResult
 import io.github.cube8540.validator.core.Validator
 import io.mockk.*
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.catchThrowable
+import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentMatchers.anyList
@@ -27,6 +26,13 @@ internal class DefaultBookRegisterServiceTest {
 
     @Nested
     inner class UpsertBookTest {
+        @Test
+        fun `request data is empty`() {
+            val requestList: List<BookPostRequest> = emptyList()
+
+            assertThatCode { service.upsertBook(requestList) }.doesNotThrowAnyException()
+        }
+
         @Test
         fun `book data invalid`() {
             val requestList: List<BookPostRequest> = listOf(createBookPostRequest(isbn = "isbn000001"))

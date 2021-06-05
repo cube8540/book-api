@@ -16,8 +16,13 @@ class BookCustomRepositoryImpl : BookCustomRepository, QuerydslRepositorySupport
         .where(book.isbn.eq(isbn))
         .fetchOne()
 
-    override fun findDetailsByIsbn(isbnList: Collection<Isbn>): List<Book> = from(book)
-        .leftJoin(book.publisher).fetchJoin()
-        .where(book.isbn.`in`(isbnList))
-        .fetch()
+    override fun findDetailsByIsbn(isbnList: Collection<Isbn>): List<Book> =
+        if (isbnList.isNotEmpty()) {
+            from(book)
+                .leftJoin(book.publisher).fetchJoin()
+                .where(book.isbn.`in`(isbnList))
+                .fetch()
+        } else {
+            emptyList()
+        }
 }
