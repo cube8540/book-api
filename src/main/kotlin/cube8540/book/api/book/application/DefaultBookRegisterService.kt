@@ -7,6 +7,7 @@ import cube8540.book.api.book.domain.Publisher
 import cube8540.book.api.book.infra.BookPostRequestBasedInitializer
 import cube8540.book.api.book.repository.BookRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class DefaultBookRegisterService constructor(
@@ -15,6 +16,7 @@ class DefaultBookRegisterService constructor(
     private val validatorFactory: BookValidatorFactory
 ): BookRegisterService {
 
+    @Transactional
     override fun upsertBook(upsertRequests: List<BookPostRequest>) {
         val requestBooks = upsertRequests.map { makeBook(it) }
         val existsBooks = bookRepository.findDetailsByIsbn(requestBooks.map { it.isbn })

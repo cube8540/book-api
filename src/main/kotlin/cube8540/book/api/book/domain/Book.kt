@@ -1,9 +1,11 @@
 package cube8540.book.api.book.domain
 
 import cube8540.book.api.BookApiApplication
+import org.hibernate.annotations.BatchSize
 import org.hibernate.annotations.DynamicInsert
 import org.hibernate.annotations.DynamicUpdate
 import org.springframework.data.domain.AbstractAggregateRoot
+import org.springframework.data.domain.Persistable
 import java.time.Clock
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -28,7 +30,7 @@ class Book(
     @JoinColumn(name = "publisher_code", nullable = false)
     var publisher: Publisher
 
-): AbstractAggregateRoot<Book>() {
+): AbstractAggregateRoot<Book>(), Persistable<Isbn> {
 
     companion object {
         internal var clock = Clock.system(BookApiApplication.DEFAULT_TIME_ZONE.toZoneId())
@@ -41,6 +43,7 @@ class Book(
     var thumbnail: BookThumbnail? = null
 
     @ElementCollection(fetch = FetchType.LAZY)
+    @BatchSize(size = 500)
     @CollectionTable(name = "book_authors", joinColumns = [JoinColumn(name = "isbn")])
     @Column(name = "author", length = 32, nullable = false)
     var authors: MutableSet<String>? = null
@@ -99,6 +102,10 @@ class Book(
     fun isValid(validatorFactory: BookValidatorFactory) {
         validatorFactory.createValidator(this).result.hasErrorThrows { BookInvalidException.instance(it) }
     }
+
+    override fun getId(): Isbn = isbn
+
+    override fun isNew(): Boolean = newObject
 
     override fun equals(other: Any?): Boolean = when (other) {
         null -> false
