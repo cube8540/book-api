@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import java.util.*
 import java.util.stream.Stream
 
 internal class DefaultPublisherDetailsServiceTest {
@@ -24,19 +25,23 @@ internal class DefaultPublisherDetailsServiceTest {
     @Nested
     inner class ExistsTest {
 
-        @ParameterizedTest
-        @MethodSource(value = ["existsInRepositoryProvider"])
-        fun `exists publisher`(existsInRepository: Boolean) {
-            every { publisherRepository.existsById(defaultPublisherCode) } returns existsInRepository
+        @Test
+        fun `not exists publisher`() {
+            every { publisherRepository.findById(defaultPublisherCode) } returns Optional.empty()
 
             val result = service.existsPublisher(defaultPublisherCode)
-            assertThat(result).isEqualTo(existsInRepository)
+            assertThat(result).isFalse
         }
 
-        fun existsInRepositoryProvider() = Stream.of(
-            Arguments.of(true),
-            Arguments.of(false)
-        )
+        @Test
+        fun `exists publisher`() {
+            val publisher = createPublisher(code = defaultPublisherCode)
+
+            every { publisherRepository.findById(defaultPublisherCode) } returns Optional.of(publisher)
+
+            val result = service.existsPublisher(defaultPublisherCode)
+            assertThat(result).isTrue
+        }
     }
 
     @Nested
