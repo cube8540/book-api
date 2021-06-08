@@ -37,6 +37,7 @@ class Publisher(codeGenerator: PublisherCodeGenerator): AbstractAggregateRoot<Pu
         private set
 
     @PostLoad
+    @PostPersist
     fun markingPersistedEntity() {
         this.newObject = false
     }

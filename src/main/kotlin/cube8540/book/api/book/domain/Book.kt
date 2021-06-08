@@ -66,6 +66,7 @@ class Book(
         private set
 
     @PostLoad
+    @PostPersist
     fun markingPersistedEntity() {
         this.newObject = false
     }
