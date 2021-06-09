@@ -3,18 +3,21 @@ package cube8540.book.api.book.application
 import cube8540.book.api.book.domain.Book
 import cube8540.book.api.book.domain.BookValidatorFactory
 import cube8540.book.api.book.domain.Isbn
-import cube8540.book.api.book.domain.Publisher
 import cube8540.book.api.book.infra.BookPostRequestBasedInitializer
 import cube8540.book.api.book.repository.BookRepository
+import cube8540.book.api.book.repository.PublisherRepository
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class DefaultBookRegisterService constructor(
     private val bookRepository: BookRepository,
-
-    private val validatorFactory: BookValidatorFactory
+    private val publisherRepository: PublisherRepository
 ): BookRegisterService {
+
+    @set:Autowired
+    lateinit var validatorFactory: BookValidatorFactory
 
     @Transactional
     override fun upsertBook(upsertRequests: List<BookPostRequest>) {
@@ -37,7 +40,7 @@ class DefaultBookRegisterService constructor(
             isbn = Isbn(upsertRequest.isbn),
             title = upsertRequest.title,
             publishDate = upsertRequest.publishDate,
-            publisher = Publisher.fake(upsertRequest.publisherCode)
+            publisher = publisherRepository.getById(upsertRequest.publisherCode)
         )
         BookPostRequestBasedInitializer(upsertRequest).initializingBook(book)
         book.isValid(validatorFactory)
