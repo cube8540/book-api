@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional
 @Component
 class BookPublisherCachingSupportAOP {
 
-    private val chunkSize = 500
+    var chunkSize = 500
 
     @set:Autowired
     lateinit var publisherRepository: PublisherRepository
