@@ -29,6 +29,7 @@ fun createBook(
     isbn: String,
     title: String = defaultTitle,
     publisherCode: String = defaultPublisherCode,
+    publisher: Publisher? = null,
     publishDate: LocalDate = defaultPublishDate,
     seriesIsbn: String? = defaultSeriesIsbn,
     seriesCode: String? = defaultSeriesCode,
@@ -43,7 +44,7 @@ fun createBook(
     val book = Book(
         isbn = Isbn(isbn),
         title = title,
-        publisher = Publisher.fake(publisherCode),
+        publisher = publisher ?: Publisher.fake(publisherCode),
         publishDate = publishDate
     )
 
