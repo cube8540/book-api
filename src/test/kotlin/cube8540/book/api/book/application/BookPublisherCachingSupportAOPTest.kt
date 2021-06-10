@@ -6,6 +6,7 @@ import io.mockk.mockk
 import io.mockk.slot
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import kotlin.random.Random
 
 internal class BookPublisherCachingSupportAOPTest {
 
@@ -34,17 +35,19 @@ internal class BookPublisherCachingSupportAOPTest {
     }
 
     @Test
-    fun `caching publisher before book upsert when request publisher code count is grater then 500`() {
-        val upsertRequests = (0..1300).map { createBookPostRequest(isbn = "isbn-$it", publisherCode = "publisher-$it") }
+    fun `caching publisher before book upsert when request publisher code count is grater then chunk`() {
+        val randomChunk = Random.nextInt(100, 500)
+        val upsertRequests = (0 until (randomChunk * 3)).map { createBookPostRequest(isbn = "isbn-$it", publisherCode = "publisher-$it") }
         val publisherCaptor = ArrayList<List<String>>()
 
+        aop.chunkSize = randomChunk
         every { publisherRepository.findAllById(capture(publisherCaptor)) } returns emptyList()
 
         aop.cachingPublisherBeforeBookUpsert(upsertRequests)
         assertThat(publisherCaptor).hasSize(3).isEqualTo(listOf(
-            (0..499).map { "publisher-$it" }.toList(),
-            (500..999).map { "publisher-$it" }.toList(),
-            (1000..1300).map { "publisher-$it" }.toList()
+            (0 until randomChunk).map { "publisher-$it" }.toList(),
+            (randomChunk until (randomChunk * 2)).map { "publisher-$it" }.toList(),
+            ((randomChunk * 2) until (randomChunk * 3)).map { "publisher-$it" }.toList()
         ))
     }
 }
