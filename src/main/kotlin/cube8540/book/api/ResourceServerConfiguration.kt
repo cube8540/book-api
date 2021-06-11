@@ -17,7 +17,8 @@ class ResourceServerConfiguration: WebSecurityConfigurerAdapter() {
                 .antMatchers("/api/v1/**")
                 .and()
             .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/api/v1/books/**").hasAuthority("SCOPE_management.book.api")
+                .antMatchers(HttpMethod.POST, "/api/v1/books/**")
+                    .access("hasAuthority('SCOPE_management.book.register') and hasAuthority('SCOPE_management.book.modify')")
                 .and()
             .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.NEVER)
@@ -26,5 +27,4 @@ class ResourceServerConfiguration: WebSecurityConfigurerAdapter() {
             .csrf().disable()
             .cors().configurationSource { CorsConfiguration().applyPermitDefaultValues() }
     }
-
 }
