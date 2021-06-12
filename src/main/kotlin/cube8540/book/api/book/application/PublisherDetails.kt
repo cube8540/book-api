@@ -4,8 +4,8 @@ import cube8540.book.api.book.domain.Publisher
 import java.time.LocalDateTime
 
 data class PublisherDetails(
-    val code: String,
-    val name: String? = null,
+    var code: String,
+    var name: String? = null,
     var createdAt: LocalDateTime? = null,
     var updatedAt: LocalDateTime? = null
 ) {

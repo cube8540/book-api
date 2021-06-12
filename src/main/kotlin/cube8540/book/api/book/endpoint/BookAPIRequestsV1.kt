@@ -7,7 +7,7 @@ import java.time.LocalDate
 data class BookRegisterRequestV1
 @ConstructorProperties(value = ["requests"])
 constructor(
-    val requests: List<BookPostRequestV1>
+    var requests: List<BookPostRequestV1>
 )
 
 data class BookPostRequestV1
@@ -26,27 +26,43 @@ data class BookPostRequestV1
     "price"
 ])
 constructor(
-    val isbn: String,
+    var isbn: String,
 
-    val title: String,
+    var title: String,
 
-    val publishDate: LocalDate,
+    var publishDate: LocalDate,
 
-    val publisherCode: String,
+    var publisherCode: String,
 
-    val seriesIsbn: String?,
+    var seriesIsbn: String?,
 
-    val seriesCode: String?,
+    var seriesCode: String?,
 
-    val largeThumbnail: URI?,
+    var largeThumbnail: URI?,
 
-    val mediumThumbnail: URI?,
+    var mediumThumbnail: URI?,
 
-    val smallThumbnail: URI?,
+    var smallThumbnail: URI?,
 
-    val authors: MutableSet<String>?,
+    var authors: MutableSet<String>?,
 
-    val description: String?,
+    var description: String?,
 
-    val price: Double?
+    var price: Double?
+)
+
+data class BookLookupRequestV1
+@ConstructorProperties(value = [
+    "publishFrom", "publishTo", "seriesIsbn", "seriesCode", "publisherCode"
+])
+constructor(
+    var publishFrom: LocalDate?,
+
+    var publishTo: LocalDate?,
+
+    var seriesIsbn: String?,
+
+    var seriesCode: String?,
+
+    var publisherCode: String?
 )
