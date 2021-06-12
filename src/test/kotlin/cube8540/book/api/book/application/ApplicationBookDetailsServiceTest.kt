@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentMatchers.anyList
 
-internal class DefaultBookRegisterServiceTest {
+internal class ApplicationBookDetailsServiceTest {
 
     private val bookRepository: BookRepository = mockk(relaxed = true)
     private val publisherRepository: PublisherRepository = mockk(relaxed = true)
@@ -21,7 +21,7 @@ internal class DefaultBookRegisterServiceTest {
     private val validator: Validator<Book> = mockk(relaxed = true)
     private val validationResult: ValidationResult = mockk(relaxed = true)
 
-    private val service = DefaultBookRegisterService(bookRepository, publisherRepository)
+    private val service = ApplicationBookDetailsService(bookRepository, publisherRepository)
 
     init {
         service.validatorFactory = validatorFactory

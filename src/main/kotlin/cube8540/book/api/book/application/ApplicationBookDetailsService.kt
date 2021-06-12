@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class DefaultBookRegisterService constructor(
+class ApplicationBookDetailsService constructor(
     private val bookRepository: BookRepository,
     private val publisherRepository: PublisherRepository
 ): BookRegisterService {
