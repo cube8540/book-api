@@ -7,9 +7,13 @@ import io.github.cube8540.validator.core.ValidationResult
 import io.github.cube8540.validator.core.Validator
 import io.mockk.*
 import org.assertj.core.api.Assertions.*
+import org.assertj.core.internal.IgnoringFieldsComparator
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentMatchers.anyList
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 
 internal class ApplicationBookDetailsServiceTest {
 
@@ -26,6 +30,33 @@ internal class ApplicationBookDetailsServiceTest {
     init {
         service.validatorFactory = validatorFactory
         every { validator.result } returns validationResult
+    }
+
+    @Nested
+    inner class LookupBookTest {
+
+        @Test
+        fun `lookup book details`() {
+            val condition = createBookLookupCondition(direction = Sort.Direction.ASC)
+            val pageRequest = PageRequest.of(0, 10)
+
+            val books = listOf(createBook(isbn = "isbn0000", publisher = createPublisher()),
+                createBook(isbn = "isbn0001", publisher = createPublisher()),
+                createBook(isbn = "isbn0002", publisher = createPublisher()))
+            val expectedCondition = createBookQueryCondition()
+            val expectedPageRequest = pageRequest.withSort(Sort.by(Sort.Direction.ASC, QBook.book.publishDate.metadata.name))
+
+            every { bookRepository.findPageByCondition(expectedCondition, expectedPageRequest) } returns PageImpl(books, expectedPageRequest, books.size.toLong())
+
+            val results = service.lookupBooks(condition, pageRequest)
+            assertThat(results.totalElements).isEqualTo(books.size.toLong())
+            assertThat(results.pageable).isEqualTo(expectedPageRequest)
+            assertThat(results.content)
+                .usingRecursiveFieldByFieldElementComparator()
+                .usingElementComparatorIgnoringFields(*bookDetailsAssertIgnoreFields)
+                .usingComparatorForElementFieldsWithNames(IgnoringFieldsComparator(*publisherDetailsAssertIgnoreFields), BookDetails::publisher.name)
+                .containsExactly(createBookDetails(isbn = "isbn0000"), createBookDetails(isbn = "isbn0001"), createBookDetails(isbn = "isbn0002"))
+        }
     }
 
     @Nested

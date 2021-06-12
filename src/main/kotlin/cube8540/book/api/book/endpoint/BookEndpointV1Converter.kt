@@ -7,7 +7,7 @@ import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.Mappings
 
-@Mapper
+@Mapper(componentModel = "spring")
 interface BookEndpointV1Converter {
 
     fun toBookPostRequest(request: BookPostRequestV1): BookPostRequest

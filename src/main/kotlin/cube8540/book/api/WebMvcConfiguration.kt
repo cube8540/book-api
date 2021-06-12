@@ -13,8 +13,17 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver
+import org.springframework.format.datetime.DateFormatter
+import org.springframework.format.datetime.DateFormatterRegistrar
+import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar
+import org.springframework.format.support.DefaultFormattingConversionService
+import org.springframework.format.support.FormattingConversionService
 import org.springframework.http.converter.HttpMessageConverter
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
+import org.springframework.web.method.support.HandlerMethodArgumentResolver
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -23,11 +32,37 @@ import java.util.*
 import javax.servlet.Filter
 
 @Configuration
-class WebMvcConfiguration: WebMvcConfigurer {
+class WebMvcConfiguration: WebMvcConfigurationSupport() {
 
     override fun configureMessageConverters(converters: MutableList<HttpMessageConverter<*>>) {
         converters.removeIf { it is MappingJackson2HttpMessageConverter }
         converters.add(MappingJackson2HttpMessageConverter(escapeObjectMapper()))
+    }
+
+    override fun addArgumentResolvers(argumentResolvers: MutableList<HandlerMethodArgumentResolver>) {
+        val pageableHandlerMethodArgumentResolver = PageableHandlerMethodArgumentResolver()
+        pageableHandlerMethodArgumentResolver.setOneIndexedParameters(true)
+        pageableHandlerMethodArgumentResolver.setMaxPageSize(100)
+        pageableHandlerMethodArgumentResolver.setFallbackPageable(PageRequest.of(0, 10))
+
+        argumentResolvers.add(pageableHandlerMethodArgumentResolver)
+    }
+
+    @Bean
+    @Primary
+    override fun mvcConversionService(): FormattingConversionService {
+        val conversionService = DefaultFormattingConversionService(false)
+
+        val dateTimeRegistrar = DateTimeFormatterRegistrar()
+        dateTimeRegistrar.setDateFormatter(DateTimeFormatter.ofPattern("yyyyMMdd"))
+        dateTimeRegistrar.setDateTimeFormatter(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
+        dateTimeRegistrar.registerFormatters(conversionService)
+
+        val dateRegistrar = DateFormatterRegistrar()
+        dateRegistrar.setFormatter(DateFormatter("yyyyMMdd"))
+        dateRegistrar.registerFormatters(conversionService)
+
+        return conversionService
     }
 
     @Bean
