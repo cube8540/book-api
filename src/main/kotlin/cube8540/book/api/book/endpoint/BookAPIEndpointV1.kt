@@ -19,9 +19,12 @@ class BookAPIEndpointV1 {
     @set:[Autowired Qualifier("bookExceptionTranslator")]
     lateinit var translator: ExceptionTranslator<ErrorMessage<Any>>
 
+    @set:[Autowired]
+    lateinit var converter: BookEndpointV1Converter
+
     @PostMapping
     fun registerBook(@RequestBody request: BookRegisterRequestV1): Map<String, String> {
-        bookRegisterService.upsertBook(request.requests)
+        bookRegisterService.upsertBook(request.requests.map { converter.toBookPostRequest(it) })
 
         return Collections.singletonMap("status", "ok")
     }
