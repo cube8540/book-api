@@ -23,7 +23,7 @@ val defaultAuthors = emptySet<String>().toMutableSet()
 const val defaultDescription = "description00000"
 const val defaultPrice = 5000.0
 
-var bookAssertIgnoreFields = listOf("createdAt", "updatedAt").toTypedArray()
+var bookAssertIgnoreFields = listOf(Book::createdAt.name, Book::updatedAt.name).toTypedArray()
 
 fun createBook(
     isbn: String,
@@ -62,7 +62,7 @@ fun createBook(
 }
 
 fun createPublisher(
-    code: String,
+    code: String = defaultPublisherCode,
     name: String? = defaultPublisherName
 ): Publisher {
     val codeGenerator: PublisherCodeGenerator = mockk(relaxed = true) {

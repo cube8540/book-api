@@ -11,6 +11,7 @@ import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
@@ -34,6 +35,12 @@ class ResourceServerConfigurationTest {
         this.mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
             .apply<DefaultMockMvcBuilder?>(springSecurity())
             .build()
+    }
+
+    @Test
+    fun `access book lookup api v1 without scope`() {
+        mvc.perform(get("/api/v1/books").contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk)
     }
 
     @Test

@@ -41,6 +41,8 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.8")
     implementation("io.github.cube8540:validator-core:1.2.0-RELEASE")
 
+    implementation("org.mapstruct:mapstruct:1.4.2.Final")
+
     runtimeOnly("com.h2database:h2")
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
 
@@ -56,6 +58,7 @@ dependencies {
     }
 
     kapt("com.querydsl:querydsl-apt:4.4.0:jpa")
+    kapt("org.mapstruct:mapstruct-processor:1.4.2.Final")
 }
 
 tasks.withType<KotlinCompile> {
