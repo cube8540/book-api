@@ -1,6 +1,7 @@
 package cube8540.book.api.book.application
 
 import cube8540.book.api.book.domain.PublisherNotFoundException
+import cube8540.book.api.book.domain.QPublisher
 import cube8540.book.api.book.domain.createPublisher
 import cube8540.book.api.book.domain.defaultPublisherCode
 import cube8540.book.api.book.repository.PublisherRepository
@@ -10,11 +11,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowable
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.MethodSource
+import org.springframework.data.domain.Sort
 import java.util.*
-import java.util.stream.Stream
 
 internal class DefaultPublisherDetailsServiceTest {
 
@@ -41,6 +39,27 @@ internal class DefaultPublisherDetailsServiceTest {
 
             val result = service.existsPublisher(defaultPublisherCode)
             assertThat(result).isTrue
+        }
+    }
+
+    @Nested
+    inner class LoadAllPublishers {
+
+        @Test
+        fun `load all publishers`() {
+            val expectedSort = Sort.by(QPublisher.publisher.name.metadata.name).ascending()
+
+            val queryResults = listOf(createPublisher(code = "code0000"),
+                createPublisher(code = "code0001"),
+                createPublisher(code = "code0002"))
+            every { publisherRepository.findAll(expectedSort) } returns queryResults
+
+            val result = service.loadAllPublishers()
+            assertThat(result)
+                .usingElementComparatorIgnoringFields(*publisherDetailsAssertIgnoreFields)
+                .containsExactly(createPublisherDetails(code = "code0000"),
+                    createPublisherDetails(code = "code0001"),
+                    createPublisherDetails(code = "code0002"))
         }
     }
 
