@@ -2,6 +2,7 @@ package cube8540.book.api.book.repository
 
 import cube8540.book.api.book.domain.Publisher
 import cube8540.book.api.book.domain.QPublisher
+import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 import org.springframework.stereotype.Repository
 
@@ -13,4 +14,11 @@ class PublisherCustomRepositoryImpl: PublisherCustomRepository, QuerydslReposito
     override fun findDetailsByCode(code: String): Publisher? = from(publisher)
         .where(publisher.code.eq(code))
         .fetchOne()
+
+    override fun findAll(sort: Sort): List<Publisher> {
+        val queryExpression = from(publisher)
+
+        querydsl!!.applySorting(sort, queryExpression)
+        return queryExpression.fetch()
+    }
 }
