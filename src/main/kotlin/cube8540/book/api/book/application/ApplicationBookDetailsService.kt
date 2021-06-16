@@ -42,19 +42,25 @@ class ApplicationBookDetailsService constructor(
     }
 
     @Transactional
-    override fun upsertBook(upsertRequests: List<BookPostRequest>) {
+    override fun upsertBook(upsertRequests: List<BookPostRequest>): BookPostResult {
         val requestBooks = upsertRequests.map { makeBook(it) }
         val existsBooks = bookRepository.findDetailsByIsbn(requestBooks.map { it.isbn })
 
         val entities = ArrayList<Book>()
+        val failedBooks = ArrayList<BookPostErrorReason>()
         requestBooks.forEach { requestBook ->
-            existsBooks.find { exists -> exists == requestBook }
-                ?.apply { this.mergeBook(requestBook) }
-                ?.let { entities.add(it) }
-                ?: entities.add(requestBook)
+            val validationResult = requestBook.validationResult(validatorFactory)
+            if (validationResult.hasError()) {
+                failedBooks.add(BookPostErrorReason(requestBook.isbn.value, validationResult.errors))
+            } else {
+                existsBooks.find { exists -> exists == requestBook }
+                    ?.apply { this.mergeBook(requestBook) }
+                    ?.let { entities.add(it) }
+                    ?: entities.add(requestBook)
+            }
         }
-
         bookRepository.saveAll(entities)
+        return BookPostResult(entities.map { it.isbn.value }, failedBooks)
     }
 
     private fun makeBook(upsertRequest: BookPostRequest): Book {
@@ -65,7 +71,6 @@ class ApplicationBookDetailsService constructor(
             publisher = publisherRepository.getById(upsertRequest.publisherCode)
         )
         BookPostRequestBasedInitializer(upsertRequest).initializingBook(book)
-        book.isValid(validatorFactory)
         return book
     }
 }

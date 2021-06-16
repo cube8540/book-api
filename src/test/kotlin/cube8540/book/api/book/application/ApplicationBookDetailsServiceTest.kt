@@ -3,10 +3,13 @@ package cube8540.book.api.book.application
 import cube8540.book.api.book.domain.*
 import cube8540.book.api.book.repository.BookRepository
 import cube8540.book.api.book.repository.PublisherRepository
-import io.github.cube8540.validator.core.ValidationResult
-import io.github.cube8540.validator.core.Validator
-import io.mockk.*
-import org.assertj.core.api.Assertions.*
+import cube8540.book.api.createValidationResults
+import io.github.cube8540.validator.core.ValidationError
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.slot
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatCode
 import org.assertj.core.internal.IgnoringFieldsComparator
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -22,14 +25,10 @@ internal class ApplicationBookDetailsServiceTest {
 
     private val validatorFactory: BookValidatorFactory = mockk(relaxed = true)
 
-    private val validator: Validator<Book> = mockk(relaxed = true)
-    private val validationResult: ValidationResult = mockk(relaxed = true)
-
     private val service = ApplicationBookDetailsService(bookRepository, publisherRepository)
 
     init {
         service.validatorFactory = validatorFactory
-        every { validator.result } returns validationResult
     }
 
     @Nested
@@ -71,17 +70,19 @@ internal class ApplicationBookDetailsServiceTest {
         @Test
         fun `book data invalid`() {
             val publisherReferenceMock: Publisher = mockk(relaxed = true)
-            val requestList: List<BookPostRequest> = listOf(createBookPostRequest(isbn = "isbn000001"))
-            val validationCaptor = slot<Book>()
+            val requestList: List<BookPostRequest> = listOf(createBookPostRequest(isbn = "isbn000000"))
 
             every { publisherRepository.getById(defaultPublisherCode) } returns publisherReferenceMock
-            every { validatorFactory.createValidator(capture(validationCaptor)) } returns validator
-            every { validationResult.hasErrorThrows(any()) } throws BookTestException()
+            every { validatorFactory.createValidator(createBook(isbn = "isbn000000")) } returns mockk() {
+                every { result } returns createValidationResults(
+                    ValidationError("isbn", "000000")
+                )
+            }
 
-            val thrown = catchThrowable { service.upsertBook(requestList) }
-            assertThat(thrown).isInstanceOf(BookTestException::class.java)
-            assertThat(validationCaptor.captured)
-                .isEqualToIgnoringGivenFields(createBook(isbn = "isbn000001", publisher = publisherReferenceMock), *bookAssertIgnoreFields)
+            val result = service.upsertBook(requestList)
+            assertThat(result.failedBooks).containsExactly(
+                BookPostErrorReason(isbn = "isbn000000", listOf(ValidationError("isbn", "000000")))
+            )
         }
 
         @Test
@@ -97,16 +98,17 @@ internal class ApplicationBookDetailsServiceTest {
             every { bookRepository.findDetailsByIsbn(anyList()) } returns emptyList()
             every { bookRepository.saveAll(capture(insertedBookCaptor)) } returnsArgument 0
             every { publisherRepository.getById(defaultPublisherCode) } returns publisherReferenceMock
+            every { validatorFactory.createValidator(any()) } returns mockk {
+                every { result } returns createValidationResults()
+            }
 
-            every { validatorFactory.createValidator(any()) } returns validator
-            every { validationResult.hasErrorThrows(any()) } just Runs
-
-            service.upsertBook(requestList)
+            val result = service.upsertBook(requestList)
             assertThat(insertedBookCaptor.captured)
                 .usingElementComparatorIgnoringFields(*bookAssertIgnoreFields)
                 .contains(createBook(isbn = "isbn000001", publisher = publisherReferenceMock),
                     createBook(isbn = "isbn000002", publisher = publisherReferenceMock),
                     createBook(isbn = "isbn000003", publisher = publisherReferenceMock))
+            assertThat(result.successBooks).containsExactly("isbn000001", "isbn000002", "isbn000003")
         }
 
         @Test
@@ -125,16 +127,17 @@ internal class ApplicationBookDetailsServiceTest {
 
             every { bookRepository.findDetailsByIsbn(existsBooks.map { it.isbn }) } returns existsBooks
             every { bookRepository.saveAll(capture(updatedBookCaptor)) } returnsArgument 0
+            every { validatorFactory.createValidator(any()) } returns mockk {
+                every { result } returns createValidationResults()
+            }
 
-            every { validatorFactory.createValidator(any()) } returns validator
-            every { validationResult.hasErrorThrows(any()) } just Runs
-
-            service.upsertBook(requestList)
+            val result = service.upsertBook(requestList)
             assertThat(updatedBookCaptor.captured)
                 .usingElementComparatorIgnoringFields(*bookAssertIgnoreFields)
                 .contains(createBook(isbn = "isbn000001", title = "newTitle0001", newObject = false),
                     createBook(isbn = "isbn000002", title = "newTitle0002", newObject = false),
                     createBook(isbn = "isbn000003", title = "newTitle0003", newObject = false))
+            assertThat(result.successBooks).containsExactly("isbn000001", "isbn000002", "isbn000003")
         }
 
         @Test
@@ -151,17 +154,17 @@ internal class ApplicationBookDetailsServiceTest {
             every { bookRepository.findDetailsByIsbn(requestList.map { Isbn(it.isbn) }) } returns existsBooks
             every { bookRepository.saveAll(capture(upsertBookCaptor)) } returnsArgument 0
             every { publisherRepository.getById(defaultPublisherCode) } returns publisherReferenceMock
+            every { validatorFactory.createValidator(any()) } returns mockk {
+                every { result } returns createValidationResults()
+            }
 
-            every { validatorFactory.createValidator(any()) } returns validator
-            every { validationResult.hasErrorThrows(any()) } just Runs
-
-            service.upsertBook(requestList)
+            val result = service.upsertBook(requestList)
             assertThat(upsertBookCaptor.captured)
                 .usingElementComparatorIgnoringFields(*bookAssertIgnoreFields)
                 .contains(createBook(isbn = "isbn000001", title = "newTitle0001", publisher = publisherReferenceMock),
                     createBook(isbn = "isbn000002", title = "newTitle0002", newObject = false),
                     createBook(isbn = "isbn000003", title = "newTitle0003", publisher = publisherReferenceMock))
-
+            assertThat(result.successBooks).containsExactly("isbn000001", "isbn000002", "isbn000003")
         }
     }
 }
