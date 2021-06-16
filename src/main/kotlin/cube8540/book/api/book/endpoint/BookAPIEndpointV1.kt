@@ -29,18 +29,14 @@ class BookAPIEndpointV1 {
     lateinit var converter: BookEndpointV1Converter
 
     @GetMapping
-    fun lookupBooks(request: BookLookupRequestV1, pageable: Pageable): Page<BookResponseV1> {
-        val page = bookDetailsService.lookupBooks(converter.toBookLookupCondition(request), pageable)
-
-        return page.map { converter.toBookResponse(it) }
-    }
+    fun lookupBooks(request: BookLookupRequestV1, pageable: Pageable): Page<BookResponseV1> = bookDetailsService
+        .lookupBooks(converter.toBookLookupCondition(request), pageable)
+        .map { converter.toBookResponse(it) }
 
     @PostMapping
-    fun registerBook(@RequestBody request: BookRegisterRequestV1): Map<String, String> {
-        bookRegisterService.upsertBook(request.requests.map { converter.toBookPostRequest(it) })
-
-        return Collections.singletonMap("status", "ok")
-    }
+    fun registerBook(@RequestBody request: BookRegisterRequestV1): BookPostResponseV1 = bookRegisterService
+        .upsertBook(request.requests.map { converter.toBookPostRequest(it) })
+        .let { converter.toBookPostResponse(it) }
 
     @ExceptionHandler(Exception::class)
     fun handle(e: Exception): ResponseEntity<ErrorMessage<Any>> = translator.translate(e)

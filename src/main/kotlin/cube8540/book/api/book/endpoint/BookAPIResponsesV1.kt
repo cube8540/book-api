@@ -1,5 +1,6 @@
 package cube8540.book.api.book.endpoint
 
+import cube8540.book.api.book.application.BookPostErrorReason
 import java.net.URI
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -20,4 +21,9 @@ data class BookResponseV1(
     var price: Double?,
     var createdAt: LocalDateTime?,
     var updatedAt: LocalDateTime?
+)
+
+data class BookPostResponseV1(
+    var successBooks: List<String> = emptyList(),
+    var failedBooks: List<BookPostErrorReason> = emptyList()
 )

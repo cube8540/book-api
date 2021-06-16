@@ -27,7 +27,7 @@ internal class BookTest {
         private val book = Book(isbn, title, publishDate, publisher)
 
         @Test
-        fun `book data is invalid`() {
+        fun `book data is invalid throws exception`() {
             val rule: ValidationRule<Book> = mockk {
                 every { isValid(book) } returns false
                 every { error() } returns ValidationError("isbn", "test")
@@ -40,7 +40,7 @@ internal class BookTest {
         }
 
         @Test
-        fun `book data is valid`() {
+        fun `book data is valid un throws exception`() {
             val rule: ValidationRule<Book> = mockk {
                 every { isValid(book) } returns true
             }
@@ -48,6 +48,20 @@ internal class BookTest {
             every { validatorFactory.createValidator(book) } returns Validator.of(book).registerRule(rule)
 
             assertThatCode { book.isValid(validatorFactory) }.doesNotThrowAnyException()
+        }
+
+        @Test
+        fun `book validation results returns`() {
+            val rule: ValidationRule<Book> = mockk {
+                every { isValid(book) } returns false
+                every { error() } returns ValidationError("isbn", "test")
+            }
+
+            every { validatorFactory.createValidator(book) } returns Validator.of(book).registerRule(rule)
+
+            val result = book.validationResult(validatorFactory)
+            assertThat(result.hasError()).isTrue
+            assertThat(result.errors).containsExactly(ValidationError("isbn", "test"))
         }
     }
 

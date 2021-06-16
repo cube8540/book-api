@@ -3,6 +3,7 @@ package cube8540.book.api.book.endpoint
 import cube8540.book.api.book.application.BookDetails
 import cube8540.book.api.book.application.BookLookupCondition
 import cube8540.book.api.book.application.BookPostRequest
+import cube8540.book.api.book.application.BookPostResult
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.Mappings
@@ -24,4 +25,6 @@ interface BookEndpointV1Converter {
         Mapping(source = "thumbnail.smallThumbnail", target = "smallThumbnail"),
     ])
     fun toBookResponse(response: BookDetails): BookResponseV1
+
+    fun toBookPostResponse(response: BookPostResult): BookPostResponseV1
 }

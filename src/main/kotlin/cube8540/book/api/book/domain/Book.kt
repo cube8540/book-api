@@ -1,6 +1,7 @@
 package cube8540.book.api.book.domain
 
 import cube8540.book.api.BookApiApplication
+import io.github.cube8540.validator.core.ValidationResult
 import org.hibernate.annotations.BatchSize
 import org.hibernate.annotations.DynamicInsert
 import org.hibernate.annotations.DynamicUpdate
@@ -103,6 +104,9 @@ class Book(
     fun isValid(validatorFactory: BookValidatorFactory) {
         validatorFactory.createValidator(this).result.hasErrorThrows { BookInvalidException.instance(it) }
     }
+
+    fun validationResult(validatorFactory: BookValidatorFactory): ValidationResult =
+        validatorFactory.createValidator(this).result
 
     override fun getId(): Isbn = isbn
 
