@@ -18,7 +18,7 @@ class ResourceServerConfiguration: WebSecurityConfigurerAdapter() {
                 .and()
             .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/api/v1/books/**")
-                    .access("hasAuthority('SCOPE_management.book.register') and hasAuthority('SCOPE_management.book.modify')")
+                    .access("hasAuthority('SCOPE_api.book.write')")
                 .and()
             .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.NEVER)
