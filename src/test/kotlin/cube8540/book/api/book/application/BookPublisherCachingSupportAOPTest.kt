@@ -29,9 +29,8 @@ internal class BookPublisherCachingSupportAOPTest {
         every { publisherRepository.findAllById(capture(publisherCaptor)) } returns emptyList()
 
         aop.cachingPublisherBeforeBookUpsert(upsertRequests)
-        assertThat(publisherCaptor.captured).isEqualTo(
-            listOf("publisher0000", "publisher0001", "publisher0002")
-        )
+        assertThat(publisherCaptor.captured)
+            .containsExactly("publisher0000", "publisher0001", "publisher0002")
     }
 
     @Test
@@ -44,10 +43,11 @@ internal class BookPublisherCachingSupportAOPTest {
         every { publisherRepository.findAllById(capture(publisherCaptor)) } returns emptyList()
 
         aop.cachingPublisherBeforeBookUpsert(upsertRequests)
-        assertThat(publisherCaptor).hasSize(3).isEqualTo(listOf(
-            (0 until randomChunk).map { "publisher-$it" }.toList(),
-            (randomChunk until (randomChunk * 2)).map { "publisher-$it" }.toList(),
-            ((randomChunk * 2) until (randomChunk * 3)).map { "publisher-$it" }.toList()
-        ))
+        assertThat(publisherCaptor).hasSize(3)
+            .containsExactly(
+                (0 until randomChunk).map { "publisher-$it" }.toList(),
+                (randomChunk until (randomChunk * 2)).map { "publisher-$it" }.toList(),
+                ((randomChunk * 2) until (randomChunk * 3)).map { "publisher-$it" }.toList()
+            )
     }
 }

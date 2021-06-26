@@ -50,21 +50,7 @@ class ResourceServerConfigurationTest {
     }
 
     @Test
-    @WithMockUser(authorities = ["SCOPE_management.book.register"])
-    fun `access book register api v1 with book register scope only`() {
-        mvc.perform(post("/api/v1/books").contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden)
-    }
-
-    @Test
-    @WithMockUser(authorities = ["SCOPE_management.book.modify"])
-    fun `access book register api v1 with book modify scope only`() {
-        mvc.perform(post("/api/v1/books").contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isForbidden)
-    }
-
-    @Test
-    @WithMockUser(authorities = ["SCOPE_management.book.modify", "SCOPE_management.book.register"])
+    @WithMockUser(authorities = ["SCOPE_api.book.write"])
     fun `access book register api v1 with book register and modify scope`() {
         val request = BookRegisterRequestV1(emptyList())
 

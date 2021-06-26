@@ -105,7 +105,7 @@ internal class ApplicationBookDetailsServiceTest {
             val result = service.upsertBook(requestList)
             assertThat(insertedBookCaptor.captured)
                 .usingElementComparatorIgnoringFields(*bookAssertIgnoreFields)
-                .contains(createBook(isbn = "isbn000001", publisher = publisherReferenceMock),
+                .containsExactly(createBook(isbn = "isbn000001", publisher = publisherReferenceMock),
                     createBook(isbn = "isbn000002", publisher = publisherReferenceMock),
                     createBook(isbn = "isbn000003", publisher = publisherReferenceMock))
             assertThat(result.successBooks).containsExactly("isbn000001", "isbn000002", "isbn000003")
@@ -134,7 +134,7 @@ internal class ApplicationBookDetailsServiceTest {
             val result = service.upsertBook(requestList)
             assertThat(updatedBookCaptor.captured)
                 .usingElementComparatorIgnoringFields(*bookAssertIgnoreFields)
-                .contains(createBook(isbn = "isbn000001", title = "newTitle0001", newObject = false),
+                .containsExactly(createBook(isbn = "isbn000001", title = "newTitle0001", newObject = false),
                     createBook(isbn = "isbn000002", title = "newTitle0002", newObject = false),
                     createBook(isbn = "isbn000003", title = "newTitle0003", newObject = false))
             assertThat(result.successBooks).containsExactly("isbn000001", "isbn000002", "isbn000003")
@@ -161,7 +161,7 @@ internal class ApplicationBookDetailsServiceTest {
             val result = service.upsertBook(requestList)
             assertThat(upsertBookCaptor.captured)
                 .usingElementComparatorIgnoringFields(*bookAssertIgnoreFields)
-                .contains(createBook(isbn = "isbn000001", title = "newTitle0001", publisher = publisherReferenceMock),
+                .containsExactly(createBook(isbn = "isbn000001", title = "newTitle0001", publisher = publisherReferenceMock),
                     createBook(isbn = "isbn000002", title = "newTitle0002", newObject = false),
                     createBook(isbn = "isbn000003", title = "newTitle0003", publisher = publisherReferenceMock))
             assertThat(result.successBooks).containsExactly("isbn000001", "isbn000002", "isbn000003")
