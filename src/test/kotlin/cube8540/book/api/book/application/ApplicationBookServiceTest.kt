@@ -18,14 +18,14 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 
-internal class ApplicationBookDetailsServiceTest {
+internal class ApplicationBookServiceTest {
 
     private val bookRepository: BookRepository = mockk(relaxed = true)
     private val publisherRepository: PublisherRepository = mockk(relaxed = true)
 
     private val validatorFactory: BookValidatorFactory = mockk(relaxed = true)
 
-    private val service = ApplicationBookDetailsService(bookRepository, publisherRepository)
+    private val service = ApplicationBookService(bookRepository, publisherRepository)
 
     init {
         service.validatorFactory = validatorFactory

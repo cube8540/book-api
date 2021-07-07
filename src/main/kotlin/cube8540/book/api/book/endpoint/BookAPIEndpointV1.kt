@@ -1,6 +1,6 @@
 package cube8540.book.api.book.endpoint
 
-import cube8540.book.api.book.application.BookDetailsService
+import cube8540.book.api.book.application.BookPageSearchService
 import cube8540.book.api.book.application.BookRegisterService
 import cube8540.book.api.error.ErrorMessage
 import cube8540.book.api.error.ExceptionTranslator
@@ -10,14 +10,13 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import java.util.*
 
 @RestController
 @RequestMapping(value = ["/api/v1/books"])
 class BookAPIEndpointV1 {
 
     @set:Autowired
-    lateinit var bookDetailsService: BookDetailsService
+    lateinit var bookDetailsService: BookPageSearchService
 
     @set:Autowired
     lateinit var bookRegisterService: BookRegisterService

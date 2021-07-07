@@ -17,10 +17,10 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class ApplicationBookDetailsService constructor(
+class ApplicationBookService constructor(
     private val bookRepository: BookRepository,
     private val publisherRepository: PublisherRepository
-): BookDetailsService, BookRegisterService {
+): BookPageSearchService, BookRegisterService {
 
     @set:Autowired
     lateinit var validatorFactory: BookValidatorFactory
