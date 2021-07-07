@@ -5,7 +5,7 @@ import java.net.URI
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-data class BookResponseV1(
+data class BookPageResponseV1(
     var isbn: String,
     var title: String,
     var publishDate: LocalDate,

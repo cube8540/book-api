@@ -24,7 +24,7 @@ interface BookEndpointV1Converter {
         Mapping(source = "thumbnail.mediumThumbnail", target = "mediumThumbnail"),
         Mapping(source = "thumbnail.smallThumbnail", target = "smallThumbnail"),
     ])
-    fun toBookResponse(response: BookDetails): BookResponseV1
+    fun toBookPageResponse(response: BookDetails): BookPageResponseV1
 
     fun toBookPostResponse(response: BookPostResult): BookPostResponseV1
 }

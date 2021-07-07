@@ -28,9 +28,9 @@ class BookAPIEndpointV1 {
     lateinit var converter: BookEndpointV1Converter
 
     @GetMapping
-    fun lookupBooks(request: BookLookupRequestV1, pageable: Pageable): Page<BookResponseV1> = bookDetailsService
+    fun lookupBooks(request: BookLookupRequestV1, pageable: Pageable): Page<BookPageResponseV1> = bookDetailsService
         .lookupBooks(converter.toBookLookupCondition(request), pageable)
-        .map { converter.toBookResponse(it) }
+        .map { converter.toBookPageResponse(it) }
 
     @PostMapping
     fun registerBook(@RequestBody request: BookRegisterRequestV1): BookPostResponseV1 = bookRegisterService
