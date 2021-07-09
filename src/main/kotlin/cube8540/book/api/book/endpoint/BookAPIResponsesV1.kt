@@ -5,7 +5,12 @@ import java.net.URI
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-data class BookPageResponseV1(
+data class BookPostResponseV1(
+    var successBooks: List<String> = emptyList(),
+    var failedBooks: List<BookPostErrorReason> = emptyList()
+)
+
+data class BookDetailsResponseV1(
     var isbn: String,
     var title: String,
     var publishDate: LocalDate,
@@ -20,10 +25,6 @@ data class BookPageResponseV1(
     var description: String?,
     var price: Double?,
     var createdAt: LocalDateTime?,
-    var updatedAt: LocalDateTime?
-)
-
-data class BookPostResponseV1(
-    var successBooks: List<String> = emptyList(),
-    var failedBooks: List<BookPostErrorReason> = emptyList()
+    var updatedAt: LocalDateTime?,
+    var seriesList: List<BookDetailsResponseV1>?
 )

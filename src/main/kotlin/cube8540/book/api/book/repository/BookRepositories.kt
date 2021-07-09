@@ -2,12 +2,15 @@ package cube8540.book.api.book.repository
 
 import cube8540.book.api.book.domain.Book
 import cube8540.book.api.book.domain.Isbn
+import cube8540.book.api.book.domain.Series
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface BookCustomRepository {
     fun findDetailsByIsbn(isbn: Isbn): Book?
+
+    fun findSeries(series: Series): List<Book>
 
     fun findDetailsByIsbn(isbnList: Collection<Isbn>): List<Book>
 

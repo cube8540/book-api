@@ -167,4 +167,52 @@ internal class ApplicationBookServiceTest {
             assertThat(result.successBooks).containsExactly("isbn000001", "isbn000002", "isbn000003")
         }
     }
+
+    @Nested
+    inner class GetBookDetails {
+
+        @Test
+        fun `get book details if not exists in repository`() {
+            val isbn = Isbn("isbn000001")
+
+            every { bookRepository.findDetailsByIsbn(isbn) } returns null
+
+            val result = service.getBookDetails(isbn)
+            assertThat(result).isNull()
+        }
+
+        @Test
+        fun `get book details if exists in repository`() {
+            val isbn = Isbn("isbn000001")
+
+            every { bookRepository.findDetailsByIsbn(isbn) } returns createBook(isbn = isbn.value, publisher = createPublisher())
+
+            val result = service.getBookDetails(isbn)
+            assertThat(result)
+                .usingComparatorForFields(IgnoringFieldsComparator(*publisherDetailsAssertIgnoreFields), BookDetails::publisher.name)
+                .isEqualToIgnoringGivenFields(createBookDetails(isbn = isbn.value), *bookDetailsAssertIgnoreFields)
+        }
+    }
+
+    @Nested
+    inner class GetSeriesList {
+
+        @Test
+        fun `get series list`() {
+            val series = Series(isbn = Isbn("isbn00000"), code = "code000000")
+
+            every { bookRepository.findSeries(series) } returns listOf(
+                createBook(isbn = "isbn00000", publisher = createPublisher()),
+                createBook(isbn = "isbn00001", publisher = createPublisher()),
+                createBook(isbn = "isbn00002", publisher = createPublisher())
+            )
+
+            val result = service.getSeriesList(series)
+            assertThat(result)
+                .usingRecursiveFieldByFieldElementComparator()
+                .usingElementComparatorIgnoringFields(*bookDetailsAssertIgnoreFields)
+                .usingComparatorForElementFieldsWithNames(IgnoringFieldsComparator(*publisherDetailsAssertIgnoreFields), BookDetails::publisher.name)
+                .containsExactly(createBookDetails(isbn = "isbn00000"), createBookDetails(isbn = "isbn00001"), createBookDetails(isbn = "isbn00002"))
+        }
+    }
 }

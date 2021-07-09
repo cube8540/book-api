@@ -1,9 +1,6 @@
 package cube8540.book.api.book.application
 
-import cube8540.book.api.book.domain.Book
-import cube8540.book.api.book.domain.BookValidatorFactory
-import cube8540.book.api.book.domain.Isbn
-import cube8540.book.api.book.domain.QBook
+import cube8540.book.api.book.domain.*
 import cube8540.book.api.book.infra.BookPostRequestBasedInitializer
 import cube8540.book.api.book.repository.BookQueryCondition
 import cube8540.book.api.book.repository.BookRepository
@@ -20,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional
 class ApplicationBookService constructor(
     private val bookRepository: BookRepository,
     private val publisherRepository: PublisherRepository
-): BookPageSearchService, BookRegisterService {
+): BookPageSearchService, BookRegisterService, BookDetailsService {
 
     @set:Autowired
     lateinit var validatorFactory: BookValidatorFactory
@@ -62,6 +59,14 @@ class ApplicationBookService constructor(
         bookRepository.saveAll(entities)
         return BookPostResult(entities.map { it.isbn.value }, failedBooks)
     }
+
+    @Transactional(readOnly = true)
+    override fun getBookDetails(isbn: Isbn): BookDetails? =
+        bookRepository.findDetailsByIsbn(isbn)?.let { BookDetails.of(it) }
+
+    @Transactional(readOnly = true)
+    override fun getSeriesList(series: Series): List<BookDetails> =
+        bookRepository.findSeries(series).map { BookDetails.of(it) }
 
     private fun makeBook(upsertRequest: BookPostRequest): Book {
         val book = Book(
