@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*
 class BookAPIEndpointV1 {
 
     @set:Autowired
-    lateinit var bookDetailsService: BookPageSearchService
+    lateinit var bookPageSearchService: BookPageSearchService
 
     @set:Autowired
     lateinit var bookRegisterService: BookRegisterService
@@ -28,7 +28,7 @@ class BookAPIEndpointV1 {
     lateinit var converter: BookEndpointV1Converter
 
     @GetMapping
-    fun lookupBooks(request: BookLookupRequestV1, pageable: Pageable): Page<BookPageResponseV1> = bookDetailsService
+    fun lookupBooks(request: BookLookupRequestV1, pageable: Pageable): Page<BookPageResponseV1> = bookPageSearchService
         .lookupBooks(converter.toBookLookupCondition(request), pageable)
         .map { converter.toBookPageResponse(it) }
 
