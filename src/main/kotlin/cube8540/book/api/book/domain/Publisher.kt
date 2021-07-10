@@ -6,6 +6,7 @@ import org.springframework.data.domain.Persistable
 import java.time.Clock
 import java.time.LocalDateTime
 import javax.persistence.*
+import org.hibernate.annotations.CreationTimestamp
 
 @Entity
 @Table(name = "publishers")
@@ -26,11 +27,12 @@ class Publisher(codeGenerator: PublisherCodeGenerator): AbstractAggregateRoot<Pu
     @Column(name = "name", length = 32, nullable = false)
     var name: String? = null
 
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false)
-    var createdAt: LocalDateTime = LocalDateTime.now(clock)
+    var createdAt: LocalDateTime? = null
 
     @Column(name = "updated_at", nullable = false)
-    var updatedAt: LocalDateTime = LocalDateTime.now(clock)
+    var updatedAt: LocalDateTime? = null
 
     @Transient
     var newObject: Boolean = true
