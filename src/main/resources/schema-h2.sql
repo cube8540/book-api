@@ -30,3 +30,4 @@ create table if not exists book_authors (
 
     foreign key (isbn) references books (isbn)
 );
+alter table book_authors alter column author varchar(128) not null;
