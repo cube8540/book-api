@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "cube8540.book"
-version = "0.7.2-HOTFIX"
+version = "0.7.2-HOTFIX2"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 repositories {
