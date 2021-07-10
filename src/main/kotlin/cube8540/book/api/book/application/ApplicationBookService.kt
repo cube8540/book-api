@@ -65,8 +65,12 @@ class ApplicationBookService constructor(
         bookRepository.findDetailsByIsbn(isbn)?.let { BookDetails.of(it) }
 
     @Transactional(readOnly = true)
-    override fun getSeriesList(series: Series): List<BookDetails> =
-        bookRepository.findSeries(series).map { BookDetails.of(it) }
+    override fun getSeriesList(series: Series): List<BookDetails> {
+        if (series.isbn == null && series.code == null) {
+            return emptyList()
+        }
+        return bookRepository.findSeries(series).map { BookDetails.of(it) }
+    }
 
     private fun makeBook(upsertRequest: BookPostRequest): Book {
         val book = Book(
