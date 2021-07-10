@@ -1,10 +1,10 @@
 package cube8540.book.api.book.application
 
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
+import cube8540.book.api.book.domain.Isbn
+import cube8540.book.api.book.domain.Series
 
 interface BookDetailsService {
+    fun getBookDetails(isbn: Isbn): BookDetails?
 
-    fun lookupBooks(condition: BookLookupCondition, pageable: Pageable): Page<BookDetails>
-
+    fun getSeriesList(series: Series): List<BookDetails>
 }
