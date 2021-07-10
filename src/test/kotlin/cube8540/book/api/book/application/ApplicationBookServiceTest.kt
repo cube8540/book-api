@@ -18,14 +18,14 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 
-internal class ApplicationBookDetailsServiceTest {
+internal class ApplicationBookServiceTest {
 
     private val bookRepository: BookRepository = mockk(relaxed = true)
     private val publisherRepository: PublisherRepository = mockk(relaxed = true)
 
     private val validatorFactory: BookValidatorFactory = mockk(relaxed = true)
 
-    private val service = ApplicationBookDetailsService(bookRepository, publisherRepository)
+    private val service = ApplicationBookService(bookRepository, publisherRepository)
 
     init {
         service.validatorFactory = validatorFactory
@@ -165,6 +165,54 @@ internal class ApplicationBookDetailsServiceTest {
                     createBook(isbn = "isbn000002", title = "newTitle0002", newObject = false),
                     createBook(isbn = "isbn000003", title = "newTitle0003", publisher = publisherReferenceMock))
             assertThat(result.successBooks).containsExactly("isbn000001", "isbn000002", "isbn000003")
+        }
+    }
+
+    @Nested
+    inner class GetBookDetails {
+
+        @Test
+        fun `get book details if not exists in repository`() {
+            val isbn = Isbn("isbn000001")
+
+            every { bookRepository.findDetailsByIsbn(isbn) } returns null
+
+            val result = service.getBookDetails(isbn)
+            assertThat(result).isNull()
+        }
+
+        @Test
+        fun `get book details if exists in repository`() {
+            val isbn = Isbn("isbn000001")
+
+            every { bookRepository.findDetailsByIsbn(isbn) } returns createBook(isbn = isbn.value, publisher = createPublisher())
+
+            val result = service.getBookDetails(isbn)
+            assertThat(result)
+                .usingComparatorForFields(IgnoringFieldsComparator(*publisherDetailsAssertIgnoreFields), BookDetails::publisher.name)
+                .isEqualToIgnoringGivenFields(createBookDetails(isbn = isbn.value), *bookDetailsAssertIgnoreFields)
+        }
+    }
+
+    @Nested
+    inner class GetSeriesList {
+
+        @Test
+        fun `get series list`() {
+            val series = Series(isbn = Isbn("isbn00000"), code = "code000000")
+
+            every { bookRepository.findSeries(series) } returns listOf(
+                createBook(isbn = "isbn00000", publisher = createPublisher()),
+                createBook(isbn = "isbn00001", publisher = createPublisher()),
+                createBook(isbn = "isbn00002", publisher = createPublisher())
+            )
+
+            val result = service.getSeriesList(series)
+            assertThat(result)
+                .usingRecursiveFieldByFieldElementComparator()
+                .usingElementComparatorIgnoringFields(*bookDetailsAssertIgnoreFields)
+                .usingComparatorForElementFieldsWithNames(IgnoringFieldsComparator(*publisherDetailsAssertIgnoreFields), BookDetails::publisher.name)
+                .containsExactly(createBookDetails(isbn = "isbn00000"), createBookDetails(isbn = "isbn00001"), createBookDetails(isbn = "isbn00002"))
         }
     }
 }

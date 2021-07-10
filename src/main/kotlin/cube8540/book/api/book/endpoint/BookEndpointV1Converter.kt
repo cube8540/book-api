@@ -15,6 +15,8 @@ interface BookEndpointV1Converter {
 
     fun toBookLookupCondition(request: BookLookupRequestV1): BookLookupCondition
 
+    fun toBookPostResponse(response: BookPostResult): BookPostResponseV1
+
     @Mappings(value = [
         Mapping(source = "publisher.code", target = "publisherCode"),
         Mapping(source = "publisher.name", target = "publisherName"),
@@ -23,8 +25,20 @@ interface BookEndpointV1Converter {
         Mapping(source = "thumbnail.largeThumbnail", target = "largeThumbnail"),
         Mapping(source = "thumbnail.mediumThumbnail", target = "mediumThumbnail"),
         Mapping(source = "thumbnail.smallThumbnail", target = "smallThumbnail"),
+        Mapping(target = "seriesList", ignore = true)
     ])
-    fun toBookResponse(response: BookDetails): BookResponseV1
+    fun toBookDetailsResponse(bookDetails: BookDetails): BookDetailsResponseV1
 
-    fun toBookPostResponse(response: BookPostResult): BookPostResponseV1
+    @Mappings(value = [
+        Mapping(source = "bookDetails.publisher.code", target = "publisherCode"),
+        Mapping(source = "bookDetails.publisher.name", target = "publisherName"),
+        Mapping(source = "bookDetails.series.isbn.value", target = "seriesIsbn"),
+        Mapping(source = "bookDetails.series.code", target = "seriesCode"),
+        Mapping(source = "bookDetails.thumbnail.largeThumbnail", target = "largeThumbnail"),
+        Mapping(source = "bookDetails.thumbnail.mediumThumbnail", target = "mediumThumbnail"),
+        Mapping(source = "bookDetails.thumbnail.smallThumbnail", target = "smallThumbnail"),
+        Mapping(source = "seriesList", target = "seriesList")
+    ])
+    fun toBookDetailsResponse(bookDetails: BookDetails, seriesList: List<BookDetails>): BookDetailsResponseV1
+
 }

@@ -4,6 +4,7 @@ import com.querydsl.core.types.dsl.BooleanExpression
 import cube8540.book.api.book.domain.Book
 import cube8540.book.api.book.domain.Isbn
 import cube8540.book.api.book.domain.QBook
+import cube8540.book.api.book.domain.Series
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
@@ -30,6 +31,14 @@ class BookCustomRepositoryImpl : BookCustomRepository, QuerydslRepositorySupport
         } else {
             emptyList()
         }
+
+    override fun findSeries(series: Series): List<Book> {
+        return from(book)
+            .leftJoin(book.publisher).fetchJoin()
+            .where(seriesEqual(series.isbn?.value, series.code))
+            .orderBy(book.publishDate.asc())
+            .fetch()
+    }
 
     override fun findPageByCondition(condition: BookQueryCondition, pageRequest: PageRequest): Page<Book> {
         val queryExpression = from(book)
