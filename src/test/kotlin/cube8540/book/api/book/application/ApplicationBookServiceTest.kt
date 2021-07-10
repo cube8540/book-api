@@ -8,6 +8,7 @@ import io.github.cube8540.validator.core.ValidationError
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
+import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.assertj.core.internal.IgnoringFieldsComparator
@@ -196,6 +197,15 @@ internal class ApplicationBookServiceTest {
 
     @Nested
     inner class GetSeriesList {
+
+        @Test
+        fun `get series list if given isbn and code is null`() {
+            val series = Series(null, null)
+
+            val result = service.getSeriesList(series)
+            assertThat(result).isEmpty()
+            verify(exactly = 0) { bookRepository.findSeries(series) }
+        }
 
         @Test
         fun `get series list`() {
