@@ -7,6 +7,7 @@ import java.time.Clock
 import java.time.LocalDateTime
 import javax.persistence.*
 import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.UpdateTimestamp
 
 @Entity
 @Table(name = "publishers")
@@ -31,6 +32,7 @@ class Publisher(codeGenerator: PublisherCodeGenerator): AbstractAggregateRoot<Pu
     @Column(name = "created_at", nullable = false)
     var createdAt: LocalDateTime? = null
 
+    @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     var updatedAt: LocalDateTime? = null
 

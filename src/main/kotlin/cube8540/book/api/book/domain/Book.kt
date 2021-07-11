@@ -12,6 +12,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.persistence.*
 import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.UpdateTimestamp
 
 @Entity
 @Table(name = "books")
@@ -61,6 +62,7 @@ class Book(
     @Column(name = "created_at", nullable = false)
     var createdAt: LocalDateTime? = null
 
+    @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     var updatedAt: LocalDateTime? = null
 
@@ -98,8 +100,6 @@ class Book(
         } else if (book.authors != null && book.authors!!.isNotEmpty()) {
             this.authors = book.authors
         }
-
-        this.updatedAt = LocalDateTime.now(clock)
     }
 
     @Transient
