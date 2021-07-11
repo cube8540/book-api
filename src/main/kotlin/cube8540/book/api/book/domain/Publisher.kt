@@ -1,13 +1,19 @@
 package cube8540.book.api.book.domain
 
 import cube8540.book.api.BookApiApplication
-import org.springframework.data.domain.AbstractAggregateRoot
-import org.springframework.data.domain.Persistable
 import java.time.Clock
 import java.time.LocalDateTime
-import javax.persistence.*
-import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.UpdateTimestamp
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.Id
+import javax.persistence.PostLoad
+import javax.persistence.PostPersist
+import javax.persistence.PrePersist
+import javax.persistence.PreUpdate
+import javax.persistence.Table
+import javax.persistence.Transient
+import org.springframework.data.domain.AbstractAggregateRoot
+import org.springframework.data.domain.Persistable
 
 @Entity
 @Table(name = "publishers")
@@ -28,17 +34,26 @@ class Publisher(codeGenerator: PublisherCodeGenerator): AbstractAggregateRoot<Pu
     @Column(name = "name", length = 32, nullable = false)
     var name: String? = null
 
-    @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     var createdAt: LocalDateTime? = null
 
-    @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     var updatedAt: LocalDateTime? = null
 
     @Transient
     var newObject: Boolean = true
         private set
+
+    @PrePersist
+    fun setCreatedAt() {
+        this.createdAt = LocalDateTime.now(Book.clock)
+        this.updatedAt = LocalDateTime.now(Book.clock)
+    }
+
+    @PreUpdate
+    fun setUpdatedAt() {
+        this.updatedAt = LocalDateTime.now(Book.clock)
+    }
 
     @PostLoad
     @PostPersist
