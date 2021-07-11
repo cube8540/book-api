@@ -17,8 +17,6 @@ import javax.persistence.Lob
 import javax.persistence.ManyToOne
 import javax.persistence.PostLoad
 import javax.persistence.PostPersist
-import javax.persistence.PrePersist
-import javax.persistence.PreUpdate
 import javax.persistence.Table
 import javax.persistence.Transient
 import org.hibernate.annotations.BatchSize
@@ -72,25 +70,14 @@ class Book(
     var price: Double? = null
 
     @Column(name = "created_at", nullable = false)
-    var createdAt: LocalDateTime? = null
+    var createdAt: LocalDateTime = LocalDateTime.now(clock)
 
     @Column(name = "updated_at", nullable = false)
-    var updatedAt: LocalDateTime? = null
+    var updatedAt: LocalDateTime = LocalDateTime.now(clock)
 
     @Transient
     var newObject: Boolean = true
         private set
-
-    @PrePersist
-    fun setCreatedAt() {
-        this.createdAt = LocalDateTime.now(clock)
-        this.updatedAt = LocalDateTime.now(clock)
-    }
-
-    @PreUpdate
-    fun setUpdatedAt() {
-        this.updatedAt = LocalDateTime.now(clock)
-    }
 
     @PostLoad
     @PostPersist
@@ -122,6 +109,8 @@ class Book(
         } else if (book.authors != null && book.authors!!.isNotEmpty()) {
             this.authors = book.authors
         }
+
+        this.updatedAt = LocalDateTime.now(clock)
     }
 
     @Transient
