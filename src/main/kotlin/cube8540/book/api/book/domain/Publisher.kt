@@ -8,8 +8,6 @@ import javax.persistence.Entity
 import javax.persistence.Id
 import javax.persistence.PostLoad
 import javax.persistence.PostPersist
-import javax.persistence.PrePersist
-import javax.persistence.PreUpdate
 import javax.persistence.Table
 import javax.persistence.Transient
 import org.springframework.data.domain.AbstractAggregateRoot
@@ -35,25 +33,14 @@ class Publisher(codeGenerator: PublisherCodeGenerator): AbstractAggregateRoot<Pu
     var name: String? = null
 
     @Column(name = "created_at", nullable = false)
-    var createdAt: LocalDateTime? = null
+    var createdAt: LocalDateTime = LocalDateTime.now(clock)
 
     @Column(name = "updated_at", nullable = false)
-    var updatedAt: LocalDateTime? = null
+    var updatedAt: LocalDateTime = LocalDateTime.now(clock)
 
     @Transient
     var newObject: Boolean = true
         private set
-
-    @PrePersist
-    fun setCreatedAt() {
-        this.createdAt = LocalDateTime.now(Book.clock)
-        this.updatedAt = LocalDateTime.now(Book.clock)
-    }
-
-    @PreUpdate
-    fun setUpdatedAt() {
-        this.updatedAt = LocalDateTime.now(Book.clock)
-    }
 
     @PostLoad
     @PostPersist
