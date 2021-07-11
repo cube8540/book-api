@@ -7,9 +7,16 @@ import cube8540.book.api.book.application.BookPostResult
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.Mappings
+import org.mapstruct.Named
 
 @Mapper(componentModel = "spring")
 interface BookEndpointV1Converter {
+
+    companion object {
+        @JvmStatic
+        @Named("convertNewLine")
+        fun convertNewLine(text: String?) = text?.replace("\\n", "\n")
+    }
 
     fun toBookPostRequest(request: BookPostRequestV1): BookPostRequest
 
@@ -25,6 +32,7 @@ interface BookEndpointV1Converter {
         Mapping(source = "thumbnail.largeThumbnail", target = "largeThumbnail"),
         Mapping(source = "thumbnail.mediumThumbnail", target = "mediumThumbnail"),
         Mapping(source = "thumbnail.smallThumbnail", target = "smallThumbnail"),
+        Mapping(source = "description", target = "description", qualifiedByName = ["convertNewLine"]),
         Mapping(target = "seriesList", ignore = true)
     ])
     fun toBookDetailsResponse(bookDetails: BookDetails): BookDetailsResponseV1
@@ -37,6 +45,7 @@ interface BookEndpointV1Converter {
         Mapping(source = "bookDetails.thumbnail.largeThumbnail", target = "largeThumbnail"),
         Mapping(source = "bookDetails.thumbnail.mediumThumbnail", target = "mediumThumbnail"),
         Mapping(source = "bookDetails.thumbnail.smallThumbnail", target = "smallThumbnail"),
+        Mapping(source = "bookDetails.description", target = "description", qualifiedByName = ["convertNewLine"]),
         Mapping(source = "seriesList", target = "seriesList")
     ])
     fun toBookDetailsResponse(bookDetails: BookDetails, seriesList: List<BookDetails>): BookDetailsResponseV1
