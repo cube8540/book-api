@@ -2,17 +2,30 @@ package cube8540.book.api.book.domain
 
 import cube8540.book.api.BookApiApplication
 import io.github.cube8540.validator.core.ValidationResult
+import java.time.Clock
+import java.time.LocalDate
+import java.time.LocalDateTime
+import javax.persistence.CollectionTable
+import javax.persistence.Column
+import javax.persistence.ElementCollection
+import javax.persistence.Embedded
+import javax.persistence.EmbeddedId
+import javax.persistence.Entity
+import javax.persistence.FetchType
+import javax.persistence.JoinColumn
+import javax.persistence.Lob
+import javax.persistence.ManyToOne
+import javax.persistence.PostLoad
+import javax.persistence.PostPersist
+import javax.persistence.PrePersist
+import javax.persistence.PreUpdate
+import javax.persistence.Table
+import javax.persistence.Transient
 import org.hibernate.annotations.BatchSize
 import org.hibernate.annotations.DynamicInsert
 import org.hibernate.annotations.DynamicUpdate
 import org.springframework.data.domain.AbstractAggregateRoot
 import org.springframework.data.domain.Persistable
-import java.time.Clock
-import java.time.LocalDate
-import java.time.LocalDateTime
-import javax.persistence.*
-import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.UpdateTimestamp
 
 @Entity
 @Table(name = "books")
@@ -58,17 +71,26 @@ class Book(
     @Column(name = "price")
     var price: Double? = null
 
-    @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     var createdAt: LocalDateTime? = null
 
-    @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     var updatedAt: LocalDateTime? = null
 
     @Transient
     var newObject: Boolean = true
         private set
+
+    @PrePersist
+    fun setCreatedAt() {
+        this.createdAt = LocalDateTime.now(clock)
+        this.updatedAt = LocalDateTime.now(clock)
+    }
+
+    @PreUpdate
+    fun setUpdatedAt() {
+        this.updatedAt = LocalDateTime.now(clock)
+    }
 
     @PostLoad
     @PostPersist
