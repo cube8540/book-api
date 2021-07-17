@@ -5,7 +5,9 @@ import cube8540.book.api.book.repository.BookRepository
 import cube8540.book.api.book.repository.PublisherRepository
 import cube8540.book.api.createValidationResults
 import io.github.cube8540.validator.core.ValidationError
+import io.mockk.Runs
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
@@ -15,6 +17,7 @@ import org.assertj.core.internal.IgnoringFieldsComparator
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentMatchers.anyList
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -25,11 +28,13 @@ internal class ApplicationBookServiceTest {
     private val publisherRepository: PublisherRepository = mockk(relaxed = true)
 
     private val validatorFactory: BookValidatorFactory = mockk(relaxed = true)
+    private val eventPublisher: ApplicationEventPublisher = mockk(relaxed = true)
 
     private val service = ApplicationBookService(bookRepository, publisherRepository)
 
     init {
         service.validatorFactory = validatorFactory
+        service.eventPublisher = eventPublisher
     }
 
     @Nested
@@ -166,6 +171,32 @@ internal class ApplicationBookServiceTest {
                     createBook(isbn = "isbn000002", title = "newTitle0002", newObject = false),
                     createBook(isbn = "isbn000003", title = "newTitle0003", publisher = publisherReferenceMock))
             assertThat(result.successBooks).containsExactly("isbn000001", "isbn000002", "isbn000003")
+        }
+
+        @Test
+        fun `event publishing after insert or update`() {
+            val requestList: List<BookPostRequest> = listOf(
+                createBookPostRequest(isbn = "isbn000001", title = "newTitle0001"),
+                createBookPostRequest(isbn = "isbn000002", title = "newTitle0002"),
+                createBookPostRequest(isbn = "isbn000003", title = "newTitle0003")
+            )
+            val publisherReferenceMock: Publisher = mockk(relaxed = true)
+            val existsBooks = listOf(createBook(isbn = "isbn000002", title = "beforeTitle0002", newObject = false))
+            val upsertBookCaptor = slot<Iterable<Book>>()
+            val publishEventCaptor = slot<BookPostedEvent>()
+
+            every { bookRepository.findDetailsByIsbn(requestList.map { Isbn(it.isbn) }) } returns existsBooks
+            every { bookRepository.saveAll(capture(upsertBookCaptor)) } returnsArgument 0
+            every { publisherRepository.getById(defaultPublisherCode) } returns publisherReferenceMock
+            every { validatorFactory.createValidator(any()) } returns mockk {
+                every { result } returns createValidationResults()
+            }
+            every { eventPublisher.publishEvent(capture(publishEventCaptor)) } just Runs
+
+            service.upsertBook(requestList)
+            assertThat(publishEventCaptor.captured.events)
+                .usingElementComparatorIgnoringFields(*bookAssertIgnoreFields)
+                .containsExactlyElementsOf(upsertBookCaptor.captured)
         }
     }
 

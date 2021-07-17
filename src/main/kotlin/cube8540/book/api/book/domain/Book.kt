@@ -17,6 +17,7 @@ import javax.persistence.Lob
 import javax.persistence.ManyToOne
 import javax.persistence.PostLoad
 import javax.persistence.PostPersist
+import javax.persistence.PostUpdate
 import javax.persistence.Table
 import javax.persistence.Transient
 import org.hibernate.annotations.BatchSize
@@ -79,10 +80,28 @@ class Book(
     var newObject: Boolean = true
         private set
 
+    @Transient
+    var persistCompleted: Boolean = false
+        private set
+
+    @Transient
+    var mergeCompleted: Boolean = false
+        private set
+
     @PostLoad
+    fun markingLoadOnRepository() {
+        this.newObject = false
+    }
+
     @PostPersist
     fun markingPersistedEntity() {
         this.newObject = false
+        this.persistCompleted = true
+    }
+
+    @PostUpdate
+    fun markingMergedEntity() {
+        this.mergeCompleted = true
     }
 
     fun mergeBook(book: Book) {
