@@ -22,3 +22,6 @@ spring:
           introspection-uri: # your oauth2 token introspection uri
           client-id: # your oauth2 client id
           client-secret: # your oauth2 client secret
+  elasticsearch:
+    rest:
+      uris: # your elasticsearch uris
