@@ -27,7 +27,7 @@ class BookAPIEndpointV1 {
     @set:Autowired
     lateinit var bookDetailsService: BookDetailsService
 
-    @set:Autowired
+    @set:[Autowired Qualifier("bookPageSearchServiceSelector")]
     lateinit var bookPageSearchService: BookPageSearchService
 
     @set:Autowired

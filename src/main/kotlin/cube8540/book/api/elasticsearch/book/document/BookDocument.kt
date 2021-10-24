@@ -2,7 +2,6 @@ package cube8540.book.api.elasticsearch.book.document
 
 import java.time.LocalDate
 import org.springframework.data.annotation.Id
-import org.springframework.data.elasticsearch.annotations.DateFormat
 import org.springframework.data.elasticsearch.annotations.Document
 import org.springframework.data.elasticsearch.annotations.Field
 import org.springframework.data.elasticsearch.annotations.FieldType
@@ -16,7 +15,7 @@ data class BookDocument(
     @Field(name = titleFieldName, type = FieldType.Text)
     val title: String,
 
-    @Field(name = publishDateFieldName, type = FieldType.Date, format = [DateFormat.date])
+    @Field(name = publishDateFieldName, type = FieldType.Date)
     val publishDate: LocalDate,
 
     @Field(name = publisherCodeFieldName, type = FieldType.Keyword)

@@ -14,5 +14,7 @@ data class BookLookupCondition(
 
     var publisherCode: String? = null,
 
+    var title: String? = null,
+
     var direction: Sort.Direction = Sort.Direction.DESC,
 )
