@@ -6,6 +6,7 @@ import cube8540.book.api.book.repository.BookQueryCondition
 import cube8540.book.api.book.repository.BookRepository
 import cube8540.book.api.book.repository.PublisherRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -21,6 +22,9 @@ class ApplicationBookService constructor(
 
     @set:Autowired
     lateinit var validatorFactory: BookValidatorFactory
+
+    @set:Autowired
+    lateinit var eventPublisher: ApplicationEventPublisher
 
     @Transactional(readOnly = true)
     override fun lookupBooks(condition: BookLookupCondition, pageable: Pageable): Page<BookDetails> {
@@ -57,6 +61,7 @@ class ApplicationBookService constructor(
             }
         }
         bookRepository.saveAll(entities)
+        eventPublisher.publishEvent(BookPostedEvent(entities))
         return BookPostResult(entities.map { it.isbn.value }, failedBooks)
     }
 

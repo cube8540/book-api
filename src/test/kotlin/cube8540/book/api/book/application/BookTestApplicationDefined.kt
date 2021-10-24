@@ -46,6 +46,7 @@ fun createBookLookupCondition(
     publishTo: LocalDate? = defaultPublishTo,
     seriesIsbn: String? = defaultSeriesIsbn,
     seriesCode: String? = defaultSeriesCode,
+    title: String? = defaultTitle,
     direction: Sort.Direction = Sort.Direction.DESC
 ): BookLookupCondition = BookLookupCondition(
     publishFrom = publishFrom,
@@ -53,6 +54,7 @@ fun createBookLookupCondition(
     publisherCode = publisherCode,
     seriesIsbn = seriesIsbn,
     seriesCode = seriesCode,
+    title = title,
     direction = direction
 )
 
