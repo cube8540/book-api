@@ -1,9 +1,9 @@
 package cube8540.book.api.book.endpoint
 
-import org.springframework.data.domain.Sort
 import java.beans.ConstructorProperties
 import java.net.URI
 import java.time.LocalDate
+import org.springframework.data.domain.Sort
 
 data class BookRegisterRequestV1
 @ConstructorProperties(value = ["requests"])
@@ -54,7 +54,7 @@ constructor(
 
 data class BookLookupRequestV1
 @ConstructorProperties(value = [
-    "publishFrom", "publishTo", "seriesIsbn", "seriesCode", "publisherCode", "direction"
+    "publishFrom", "publishTo", "seriesIsbn", "seriesCode", "publisherCode", "title", "direction"
 ])
 constructor(
     var publishFrom: LocalDate?,
@@ -66,6 +66,8 @@ constructor(
     var seriesCode: String?,
 
     var publisherCode: String?,
+
+    var title: String?,
 
     var direction: Sort.Direction? = Sort.Direction.DESC
 )

@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "cube8540.book"
-version = "0.7.3"
+version = "0.7.4"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 repositories {
@@ -23,6 +23,7 @@ sourceSets["main"].withConvention(org.jetbrains.kotlin.gradle.plugin.KotlinSourc
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-data-elasticsearch")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-web")
