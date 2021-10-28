@@ -29,7 +29,7 @@ internal class BookElasticsearchExchangerTest {
     @Test
     fun `elasticsearch throws page invalid exception`() {
         val randomPage = Random.nextInt(0, 100)
-        val randomSize = Random.nextInt(0, 100)
+        val randomSize = Random.nextInt(1, 100)
 
         val searchRequest = createExternalSearchRequest()
         val pageable = PageRequest.of(randomPage, randomSize)
@@ -47,7 +47,7 @@ internal class BookElasticsearchExchangerTest {
     @Test
     fun `convert search condition to elasticsearch request`() {
         val randomPage = Random.nextInt(0, 100)
-        val randomSize = Random.nextInt(0, 100)
+        val randomSize = Random.nextInt(1, 100)
         val randomTotalSize = Random.nextLong((randomPage * randomSize).toLong(), Long.MAX_VALUE)
 
         val searchRequest = createExternalSearchRequest()
@@ -65,7 +65,7 @@ internal class BookElasticsearchExchangerTest {
     @Test
     fun `returns elasticsearch results isbn`() {
         val randomPage = Random.nextInt(0, 100)
-        val randomSize = Random.nextInt(0, 100)
+        val randomSize = Random.nextInt(1, 100)
         val randomTotalSize = Random.nextLong((randomPage * randomSize).toLong(), Long.MAX_VALUE)
 
         val searchRequest = createExternalSearchRequest()
