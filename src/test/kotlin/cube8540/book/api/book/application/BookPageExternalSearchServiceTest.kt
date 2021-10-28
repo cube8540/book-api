@@ -32,7 +32,7 @@ internal class BookPageExternalSearchServiceTest {
     @Test
     fun `search condition title is null`() {
         val randomPage = Random.nextInt(0, 100)
-        val randomSize = Random.nextInt(0, 100)
+        val randomSize = Random.nextInt(1, 100)
 
         val condition = createBookLookupCondition(title = null)
         val pageable = PageRequest.of(randomPage, randomSize)
@@ -46,7 +46,7 @@ internal class BookPageExternalSearchServiceTest {
     @Test
     fun `convert search condition to external search request`() {
         val randomPage = Random.nextInt(0, 100)
-        val randomSize = Random.nextInt(0, 100)
+        val randomSize = Random.nextInt(1, 100)
         val randomTotalSize = Random.nextLong((randomPage * randomSize).toLong(), Long.MAX_VALUE)
 
         val condition = createBookLookupCondition()
@@ -66,7 +66,7 @@ internal class BookPageExternalSearchServiceTest {
     @Test
     fun `returns book details after convert search results to book details`() {
         val randomPage = Random.nextInt(0, 100)
-        val randomSize = Random.nextInt(0, 100)
+        val randomSize = Random.nextInt(1, 100)
         val randomTotalSize = Random.nextLong((randomPage * randomSize).toLong(), Long.MAX_VALUE)
 
         val condition = createBookLookupCondition()
@@ -94,7 +94,7 @@ internal class BookPageExternalSearchServiceTest {
     @Test
     fun `sorting book details in the order of the results`() {
         val randomPage = Random.nextInt(0, 100)
-        val randomSize = Random.nextInt(0, 100)
+        val randomSize = Random.nextInt(1, 100)
         val randomTotalSize = Random.nextLong((randomPage * randomSize).toLong(), Long.MAX_VALUE)
 
         val condition = createBookLookupCondition()
