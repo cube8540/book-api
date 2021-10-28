@@ -46,6 +46,7 @@ interface BookEndpointV1Converter {
         Mapping(source = "bookDetails.thumbnail.mediumThumbnail", target = "mediumThumbnail"),
         Mapping(source = "bookDetails.thumbnail.smallThumbnail", target = "smallThumbnail"),
         Mapping(source = "bookDetails.description", target = "description", qualifiedByName = ["convertNewLine"]),
+        Mapping(source = "bookDetails.indexes", target = "indexes"),
         Mapping(source = "seriesList", target = "seriesList")
     ])
     fun toBookDetailsResponse(bookDetails: BookDetails, seriesList: List<BookDetails>): BookDetailsResponseV1

@@ -28,6 +28,14 @@ create index if not exists book_series_isbn_index on books (series_isbn);
 alter table books change column created_at created_at timestamp not null default current_timestamp;
 alter table books change column updated_at updated_at timestamp not null default current_timestamp;
 
+create table if not exists book_indexes (
+    isbn varchar(13) not null,
+    title varchar(128) not null,
+    odr int not null,
+
+    foreign key (isbn) references books (isbn)
+);
+
 create table if not exists book_authors (
     isbn varchar(13) not null,
     author varchar(32) not null,

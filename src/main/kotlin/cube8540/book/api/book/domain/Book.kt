@@ -15,6 +15,7 @@ import javax.persistence.FetchType
 import javax.persistence.JoinColumn
 import javax.persistence.Lob
 import javax.persistence.ManyToOne
+import javax.persistence.OrderColumn
 import javax.persistence.PostLoad
 import javax.persistence.PostPersist
 import javax.persistence.PostUpdate
@@ -23,6 +24,7 @@ import javax.persistence.Transient
 import org.hibernate.annotations.BatchSize
 import org.hibernate.annotations.DynamicInsert
 import org.hibernate.annotations.DynamicUpdate
+import org.hibernate.annotations.UpdateTimestamp
 import org.springframework.data.domain.AbstractAggregateRoot
 import org.springframework.data.domain.Persistable
 
@@ -67,12 +69,20 @@ class Book(
     @Column(name = "description", columnDefinition = "text")
     var description: String? = null
 
+    @ElementCollection(fetch = FetchType.LAZY)
+    @BatchSize(size = 500)
+    @CollectionTable(name = "book_indexes", joinColumns = [JoinColumn(name = "isbn")])
+    @Column(name = "title", length = 128, nullable = false)
+    @OrderColumn(name = "odr")
+    var indexes: MutableList<String>? = null
+
     @Column(name = "price")
     var price: Double? = null
 
     @Column(name = "created_at", nullable = false)
     var createdAt: LocalDateTime = LocalDateTime.now(clock)
 
+    @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now(clock)
 
@@ -111,6 +121,10 @@ class Book(
         book.description?.let { this.description = it }
         book.price?.let { this.price = it }
 
+        if (book.indexes != null && this.indexes != book.indexes) {
+            this.indexes = book.indexes
+        }
+
         if (this.series != null && book.series != null) {
             this.series!!.mergeSeries(book.series!!)
         } else if (book.series != null) {
@@ -128,8 +142,6 @@ class Book(
         } else if (book.authors != null && book.authors!!.isNotEmpty()) {
             this.authors = book.authors
         }
-
-        this.updatedAt = LocalDateTime.now(clock)
     }
 
     @Transient
