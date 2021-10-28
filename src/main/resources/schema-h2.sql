@@ -24,6 +24,14 @@ create index if not exists book_publish_date_index on books (publish_date);
 create index if not exists book_series_code_index on books (series_code);
 create index if not exists book_series_isbn_index on books (series_isbn);
 
+create table if not exists book_indexes (
+    isbn varchar(13) not null,
+    title varchar(128) not null,
+    odr int not null,
+
+    foreign key (isbn) references books (isbn)
+);
+
 create table if not exists book_authors (
     isbn varchar(13) not null,
     author varchar(32) not null,

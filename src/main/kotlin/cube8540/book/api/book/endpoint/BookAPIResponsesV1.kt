@@ -23,6 +23,7 @@ data class BookDetailsResponseV1(
     var smallThumbnail: URI?,
     var authors: Set<String>?,
     var description: String?,
+    var indexes: List<String>?,
     var price: Double?,
     var createdAt: LocalDateTime?,
     var updatedAt: LocalDateTime?,

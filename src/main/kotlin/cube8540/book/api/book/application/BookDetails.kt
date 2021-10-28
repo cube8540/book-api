@@ -15,6 +15,7 @@ data class BookDetails(
     val thumbnail: BookThumbnail? = null,
     val authors: Set<String>? = null,
     val description: String? = null,
+    val indexes: List<String>? = null,
     val price: Double? = null,
     val createdAt: LocalDateTime? = null,
     val updatedAt: LocalDateTime? = null
@@ -29,6 +30,7 @@ data class BookDetails(
             thumbnail = book.thumbnail,
             authors = book.authors?.map { it }?.toSet(),
             description = book.description,
+            indexes = book.indexes?.toList(),
             price = book.price,
             createdAt = book.createdAt,
             updatedAt = book.updatedAt

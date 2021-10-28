@@ -26,5 +26,7 @@ data class BookPostRequest(
 
     var description: String?,
 
+    var indexes: MutableList<String>?,
+
     var price: Double?
 )

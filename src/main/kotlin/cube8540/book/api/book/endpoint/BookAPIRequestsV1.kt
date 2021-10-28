@@ -24,6 +24,7 @@ data class BookPostRequestV1
     "smallThumbnail",
     "authors",
     "description",
+    "indexes",
     "price"
 ])
 constructor(
@@ -48,6 +49,8 @@ constructor(
     var authors: MutableSet<String>?,
 
     var description: String?,
+
+    var indexes: MutableList<String>?,
 
     var price: Double?
 )

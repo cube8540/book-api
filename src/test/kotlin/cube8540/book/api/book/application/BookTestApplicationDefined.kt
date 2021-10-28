@@ -1,10 +1,24 @@
 package cube8540.book.api.book.application
 
-import cube8540.book.api.book.domain.*
+import cube8540.book.api.book.domain.createSeries
+import cube8540.book.api.book.domain.createThumbnail
+import cube8540.book.api.book.domain.defaultAuthors
+import cube8540.book.api.book.domain.defaultDescription
+import cube8540.book.api.book.domain.defaultIndexes
+import cube8540.book.api.book.domain.defaultLargeThumbnail
+import cube8540.book.api.book.domain.defaultMediumThumbnail
+import cube8540.book.api.book.domain.defaultPrice
+import cube8540.book.api.book.domain.defaultPublishDate
+import cube8540.book.api.book.domain.defaultPublisherCode
+import cube8540.book.api.book.domain.defaultPublisherName
+import cube8540.book.api.book.domain.defaultSeriesCode
+import cube8540.book.api.book.domain.defaultSeriesIsbn
+import cube8540.book.api.book.domain.defaultSmallThumbnail
+import cube8540.book.api.book.domain.defaultTitle
 import cube8540.book.api.book.repository.BookQueryCondition
-import org.springframework.data.domain.Sort
 import java.net.URI
 import java.time.LocalDate
+import org.springframework.data.domain.Sort
 
 val defaultPublishFrom: LocalDate = LocalDate.of(2021, 6, 1)
 val defaultPublishTo: LocalDate = LocalDate.of(2021, 6, 30)
@@ -24,6 +38,7 @@ fun createBookPostRequest(
     smallThumbnail: URI? = defaultSmallThumbnail,
     authors: MutableSet<String>? = defaultAuthors,
     description: String? = defaultDescription,
+    indexes: MutableList<String>? = defaultIndexes,
     price: Double? = defaultPrice
 ): BookPostRequest = BookPostRequest(
     isbn = isbn,
@@ -37,6 +52,7 @@ fun createBookPostRequest(
     smallThumbnail = smallThumbnail,
     authors = authors,
     description = description,
+    indexes = indexes,
     price = price
 )
 
@@ -85,6 +101,7 @@ fun createBookDetails(
     smallThumbnail: URI? = defaultSmallThumbnail,
     authors: MutableSet<String>? = defaultAuthors,
     description: String? = defaultDescription,
+    indexes: MutableList<String>? = defaultIndexes,
     price: Double? = defaultPrice
 ): BookDetails = BookDetails(
     isbn = isbn,
@@ -95,6 +112,7 @@ fun createBookDetails(
     thumbnail = createThumbnail(largeThumbnail, mediumThumbnail, smallThumbnail),
     authors = authors,
     description = description,
+    indexes = indexes,
     price = price
 )
 
