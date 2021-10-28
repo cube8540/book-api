@@ -20,6 +20,7 @@ class BookPostRequestBasedInitializer(private val register: BookPostRequest): Bo
 
         book.authors = register.authors
         book.description = register.description
+        book.indexes = register.indexes
         book.price = register.price
     }
 }

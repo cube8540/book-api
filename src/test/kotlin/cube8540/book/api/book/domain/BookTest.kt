@@ -120,6 +120,48 @@ internal class BookTest {
         }
 
         @Test
+        fun `book change index when given index is null`() {
+            val originalIndex = mutableListOf("originalIndex 0000")
+
+            val index = null
+            val book: Book = mockk(relaxed = true)
+
+            bookBase.indexes = originalIndex
+            every { book.indexes } returns index
+
+            bookBase.mergeBook(book)
+            assertThat(bookBase.indexes).isEqualTo(originalIndex)
+        }
+
+        @Test
+        fun `book change index when given index is equal original index`() {
+            val originalIndex = mutableListOf("originalIndex 0000")
+
+            val index = mutableListOf("originalIndex 0000")
+            val book: Book = mockk(relaxed = true)
+
+            bookBase.indexes = originalIndex
+            every { book.indexes } returns index
+
+            bookBase.mergeBook(book)
+            assertThat(bookBase.indexes === index).isFalse
+        }
+
+        @Test
+        fun `book change index`() {
+            val originalIndex = mutableListOf("originalIndex 0000")
+
+            val index = mutableListOf("mergedIndex 0000")
+            val book: Book = mockk(relaxed = true)
+
+            bookBase.indexes = originalIndex
+            every { book.indexes } returns index
+
+            bookBase.mergeBook(book)
+            assertThat(bookBase.indexes).isEqualTo(index)
+        }
+
+        @Test
         fun `book change price when given price is null`() {
             val originalPrice = Random.nextDouble()
 

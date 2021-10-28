@@ -21,6 +21,8 @@ val defaultSmallThumbnail: URI = URI.create("http://small-thumbnail")
 
 val defaultAuthors = emptySet<String>().toMutableSet()
 const val defaultDescription = "description00000"
+val defaultIndexes = mutableListOf("index 0000", "index 0001", "index 0002")
+
 const val defaultPrice = 5000.0
 
 var bookAssertIgnoreFields = listOf(Book::createdAt.name, Book::updatedAt.name).toTypedArray()
@@ -38,6 +40,7 @@ fun createBook(
     smallThumbnail: URI? = defaultSmallThumbnail,
     authors: MutableSet<String>? = defaultAuthors,
     description: String? = defaultDescription,
+    indexes: MutableList<String>? = defaultIndexes,
     price: Double? = defaultPrice,
     newObject: Boolean = true
 ): Book {
@@ -52,6 +55,7 @@ fun createBook(
     book.thumbnail = createThumbnail(largeThumbnail, mediumThumbnail, smallThumbnail)
     book.authors = authors
     book.description = description
+    book.indexes = indexes
     book.price = price
 
     if (!newObject) {
