@@ -60,7 +60,9 @@ internal class ApplicationBookServiceTest {
                 .usingRecursiveFieldByFieldElementComparator()
                 .usingElementComparatorIgnoringFields(*bookDetailsAssertIgnoreFields)
                 .usingComparatorForElementFieldsWithNames(IgnoringFieldsComparator(*publisherDetailsAssertIgnoreFields), BookDetails::publisher.name)
-                .containsExactly(createBookDetails(isbn = "isbn0000"), createBookDetails(isbn = "isbn0001"), createBookDetails(isbn = "isbn0002"))
+                .containsExactly(createBookDetails(isbn = "isbn0000", authors = null, indexes = null),
+                    createBookDetails(isbn = "isbn0001", authors = null, indexes = null),
+                    createBookDetails(isbn = "isbn0002", authors = null, indexes = null))
         }
     }
 

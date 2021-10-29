@@ -39,7 +39,7 @@ class ApplicationBookService constructor(
             .withSort(Sort.by(condition.direction, QBook.book.publishDate.metadata.name))
 
         val page = bookRepository.findPageByCondition(queryCondition, pageRequest)
-        return page.map { BookDetails.of(it) }
+        return page.map { BookDetails.withoutCollection(it) }
     }
 
     @Transactional

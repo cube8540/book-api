@@ -35,5 +35,18 @@ data class BookDetails(
             createdAt = book.createdAt,
             updatedAt = book.updatedAt
         )
+
+        fun withoutCollection(book: Book): BookDetails = BookDetails(
+            isbn = book.isbn.value,
+            title = book.title,
+            publisher = PublisherDetails.of(book.publisher),
+            publishDate = book.publishDate,
+            series = book.series,
+            thumbnail = book.thumbnail,
+            description = book.description,
+            price = book.price,
+            createdAt = book.createdAt,
+            updatedAt = book.updatedAt
+        )
     }
 }
