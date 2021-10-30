@@ -1,6 +1,6 @@
 package cube8540.book.api.book.endpoint
 
-import cube8540.book.api.book.application.BookDetails
+import cube8540.book.api.book.application.BookDetail
 import cube8540.book.api.book.application.BookLookupCondition
 import cube8540.book.api.book.application.BookPostRequest
 import cube8540.book.api.book.application.BookPostResult
@@ -35,7 +35,7 @@ interface BookEndpointV1Converter {
         Mapping(source = "description", target = "description", qualifiedByName = ["convertNewLine"]),
         Mapping(target = "seriesList", ignore = true)
     ])
-    fun toBookDetailsResponse(bookDetails: BookDetails): BookDetailsResponseV1
+    fun toBookDetailsResponse(bookDetails: BookDetail): BookDetailResponseV1
 
     @Mappings(value = [
         Mapping(source = "bookDetails.publisher.code", target = "publisherCode"),
@@ -49,6 +49,6 @@ interface BookEndpointV1Converter {
         Mapping(source = "bookDetails.indexes", target = "indexes"),
         Mapping(source = "seriesList", target = "seriesList")
     ])
-    fun toBookDetailsResponse(bookDetails: BookDetails, seriesList: List<BookDetails>): BookDetailsResponseV1
+    fun toBookDetailsResponse(bookDetails: BookDetail, seriesList: List<BookDetail>): BookDetailResponseV1
 
 }

@@ -1,7 +1,13 @@
 package cube8540.book.api.book.infra
 
+import cube8540.book.api.book.application.BookExternalLinkPostRequest
 import cube8540.book.api.book.application.BookPostRequest
-import cube8540.book.api.book.domain.*
+import cube8540.book.api.book.domain.Book
+import cube8540.book.api.book.domain.BookExternalLink
+import cube8540.book.api.book.domain.BookInitializer
+import cube8540.book.api.book.domain.BookThumbnail
+import cube8540.book.api.book.domain.Isbn
+import cube8540.book.api.book.domain.Series
 
 class BookPostRequestBasedInitializer(private val register: BookPostRequest): BookInitializer {
 
@@ -21,6 +27,10 @@ class BookPostRequestBasedInitializer(private val register: BookPostRequest): Bo
         book.authors = register.authors
         book.description = register.description
         book.indexes = register.indexes
-        book.price = register.price
+        book.externalLinks = register.externalLinks
+            ?.mapValues { it -> convertExternalLink(it.value) }?.toMutableMap()
     }
+
+    private fun convertExternalLink(externalLink: BookExternalLinkPostRequest): BookExternalLink =
+        BookExternalLink(externalLink.productDetailPage, externalLink.originalPrice, externalLink.salePrice)
 }
