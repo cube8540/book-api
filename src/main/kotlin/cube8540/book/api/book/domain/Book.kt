@@ -11,20 +11,24 @@ import javax.persistence.ElementCollection
 import javax.persistence.Embedded
 import javax.persistence.EmbeddedId
 import javax.persistence.Entity
+import javax.persistence.EnumType
 import javax.persistence.FetchType
 import javax.persistence.JoinColumn
 import javax.persistence.Lob
 import javax.persistence.ManyToOne
+import javax.persistence.MapKeyColumn
+import javax.persistence.MapKeyEnumerated
 import javax.persistence.OrderColumn
 import javax.persistence.PostLoad
 import javax.persistence.PostPersist
 import javax.persistence.PostUpdate
+import javax.persistence.PrePersist
+import javax.persistence.PreUpdate
 import javax.persistence.Table
 import javax.persistence.Transient
 import org.hibernate.annotations.BatchSize
 import org.hibernate.annotations.DynamicInsert
 import org.hibernate.annotations.DynamicUpdate
-import org.hibernate.annotations.UpdateTimestamp
 import org.springframework.data.domain.AbstractAggregateRoot
 import org.springframework.data.domain.Persistable
 
@@ -76,13 +80,16 @@ class Book(
     @OrderColumn(name = "odr")
     var indexes: MutableList<String>? = null
 
-    @Column(name = "price")
-    var price: Double? = null
+    @ElementCollection(fetch = FetchType.LAZY)
+    @BatchSize(size = 500)
+    @CollectionTable(name = "book_external_links", joinColumns = [JoinColumn(name = "isbn")])
+    @MapKeyColumn(name = "mapping_type", length = 32, nullable = false)
+    @MapKeyEnumerated(EnumType.STRING)
+    var externalLinks: MutableMap<MappingType, BookExternalLink>? = null
 
     @Column(name = "created_at", nullable = false)
     var createdAt: LocalDateTime = LocalDateTime.now(clock)
 
-    @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now(clock)
 
@@ -90,28 +97,20 @@ class Book(
     var newObject: Boolean = true
         private set
 
-    @Transient
-    var persistCompleted: Boolean = false
-        private set
-
-    @Transient
-    var mergeCompleted: Boolean = false
-        private set
-
     @PostLoad
+    @PostPersist
+    @PostUpdate
     fun markingLoadOnRepository() {
         this.newObject = false
     }
 
-    @PostPersist
-    fun markingPersistedEntity() {
-        this.newObject = false
-        this.persistCompleted = true
-    }
-
-    @PostUpdate
-    fun markingMergedEntity() {
-        this.mergeCompleted = true
+    @PreUpdate
+    @PrePersist
+    fun markingLastUpdatedAt() {
+        this.updatedAt = LocalDateTime.now(clock)
+        if (domainEvents().none { it is BookPostedEvent }) {
+            registerEvent(BookPostedEvent(isbn, updatedAt))
+        }
     }
 
     fun mergeBook(book: Book) {
@@ -119,7 +118,6 @@ class Book(
         this.publishDate = book.publishDate
 
         book.description?.let { this.description = it }
-        book.price?.let { this.price = it }
 
         if (book.indexes != null && this.indexes != book.indexes) {
             this.indexes = book.indexes
@@ -137,10 +135,18 @@ class Book(
             this.thumbnail = book.thumbnail
         }
 
-        if (this.authors != null && book.authors != null && book.authors!!.isNotEmpty()) {
+        if (this.authors != null && book.authors != null && this.authors != book.authors) {
             this.authors!!.addAll(book.authors!!)
-        } else if (book.authors != null && book.authors!!.isNotEmpty()) {
+            this.markingLastUpdatedAt()
+        } else if (this.authors != book.authors && book.authors != null) {
             this.authors = book.authors
+        }
+
+        if (this.externalLinks != null && book.externalLinks != null && this.externalLinks != book.externalLinks) {
+            this.externalLinks!!.putAll(book.externalLinks!!)
+            this.markingLastUpdatedAt()
+        } else if (this.externalLinks != book.externalLinks && book.externalLinks != null) {
+            this.externalLinks = book.externalLinks
         }
     }
 

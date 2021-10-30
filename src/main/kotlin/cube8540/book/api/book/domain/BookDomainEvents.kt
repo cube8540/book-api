@@ -1,5 +1,6 @@
 package cube8540.book.api.book.domain
 
-import org.springframework.context.ApplicationEvent
+import java.io.Serializable
+import java.time.LocalDateTime
 
-data class BookPostedEvent(val events: List<Book>): ApplicationEvent(events.map { it.isbn })
+data class BookPostedEvent(val isbn: Isbn, val issuedAt: LocalDateTime): Serializable

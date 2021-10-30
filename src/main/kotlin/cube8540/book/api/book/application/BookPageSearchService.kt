@@ -5,6 +5,6 @@ import org.springframework.data.domain.Pageable
 
 interface BookPageSearchService {
 
-    fun lookupBooks(condition: BookLookupCondition, pageable: Pageable): Page<BookDetails>
+    fun lookupBooks(condition: BookLookupCondition, pageable: Pageable): Page<BookDetail>
 
 }

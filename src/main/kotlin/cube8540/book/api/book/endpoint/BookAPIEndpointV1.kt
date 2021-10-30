@@ -40,7 +40,7 @@ class BookAPIEndpointV1 {
     lateinit var converter: BookEndpointV1Converter
 
     @GetMapping
-    fun lookupBooks(request: BookLookupRequestV1, pageable: Pageable): Page<BookDetailsResponseV1> = bookPageSearchService
+    fun lookupBooks(request: BookLookupRequestV1, pageable: Pageable): Page<BookDetailResponseV1> = bookPageSearchService
         .lookupBooks(converter.toBookLookupCondition(request), pageable)
         .map { converter.toBookDetailsResponse(it) }
 
@@ -50,7 +50,7 @@ class BookAPIEndpointV1 {
         .let { converter.toBookPostResponse(it) }
 
     @GetMapping(value = ["/{isbn}"])
-    fun getBookDetails(@PathVariable isbn: String): BookDetailsResponseV1 {
+    fun getBookDetails(@PathVariable isbn: String): BookDetailResponseV1 {
         val bookDetails = bookDetailsService.getBookDetails(Isbn(isbn))
             ?: throw BookNotFoundException.instance("$isbn is not found")
         val seriesList = bookDetails.series?.let { bookDetailsService.getSeriesList(it) } ?: emptyList()

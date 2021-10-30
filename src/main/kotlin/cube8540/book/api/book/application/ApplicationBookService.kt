@@ -6,7 +6,6 @@ import cube8540.book.api.book.repository.BookQueryCondition
 import cube8540.book.api.book.repository.BookRepository
 import cube8540.book.api.book.repository.PublisherRepository
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -23,11 +22,8 @@ class ApplicationBookService constructor(
     @set:Autowired
     lateinit var validatorFactory: BookValidatorFactory
 
-    @set:Autowired
-    lateinit var eventPublisher: ApplicationEventPublisher
-
     @Transactional(readOnly = true)
-    override fun lookupBooks(condition: BookLookupCondition, pageable: Pageable): Page<BookDetails> {
+    override fun lookupBooks(condition: BookLookupCondition, pageable: Pageable): Page<BookDetail> {
         val queryCondition = BookQueryCondition(
             publishFrom = condition.publishFrom,
             publishTo = condition.publishTo,
@@ -39,7 +35,7 @@ class ApplicationBookService constructor(
             .withSort(Sort.by(condition.direction, QBook.book.publishDate.metadata.name))
 
         val page = bookRepository.findPageByCondition(queryCondition, pageRequest)
-        return page.map { BookDetails.withoutCollection(it) }
+        return page.map { BookDetail.withoutCollection(it) }
     }
 
     @Transactional
@@ -61,20 +57,19 @@ class ApplicationBookService constructor(
             }
         }
         bookRepository.saveAll(entities)
-        eventPublisher.publishEvent(BookPostedEvent(entities))
         return BookPostResult(entities.map { it.isbn.value }, failedBooks)
     }
 
     @Transactional(readOnly = true)
-    override fun getBookDetails(isbn: Isbn): BookDetails? =
-        bookRepository.findDetailsByIsbn(isbn)?.let { BookDetails.of(it) }
+    override fun getBookDetails(isbn: Isbn): BookDetail? =
+        bookRepository.findDetailsByIsbn(isbn)?.let { BookDetail.of(it) }
 
     @Transactional(readOnly = true)
-    override fun getSeriesList(series: Series): List<BookDetails> {
+    override fun getSeriesList(series: Series): List<BookDetail> {
         if (series.isbn == null && series.code == null) {
             return emptyList()
         }
-        return bookRepository.findSeries(series).map { BookDetails.of(it) }
+        return bookRepository.findSeries(series).map { BookDetail.of(it) }
     }
 
     private fun makeBook(upsertRequest: BookPostRequest): Book {

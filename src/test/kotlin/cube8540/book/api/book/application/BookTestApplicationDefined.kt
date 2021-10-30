@@ -1,16 +1,21 @@
 package cube8540.book.api.book.application
 
+import cube8540.book.api.book.domain.BookExternalLink
+import cube8540.book.api.book.domain.MappingType
 import cube8540.book.api.book.domain.createSeries
 import cube8540.book.api.book.domain.createThumbnail
 import cube8540.book.api.book.domain.defaultAuthors
 import cube8540.book.api.book.domain.defaultDescription
+import cube8540.book.api.book.domain.defaultExternalLinks
 import cube8540.book.api.book.domain.defaultIndexes
 import cube8540.book.api.book.domain.defaultLargeThumbnail
+import cube8540.book.api.book.domain.defaultLinkUri
 import cube8540.book.api.book.domain.defaultMediumThumbnail
-import cube8540.book.api.book.domain.defaultPrice
+import cube8540.book.api.book.domain.defaultOriginalPrice
 import cube8540.book.api.book.domain.defaultPublishDate
 import cube8540.book.api.book.domain.defaultPublisherCode
 import cube8540.book.api.book.domain.defaultPublisherName
+import cube8540.book.api.book.domain.defaultSalePrice
 import cube8540.book.api.book.domain.defaultSeriesCode
 import cube8540.book.api.book.domain.defaultSeriesIsbn
 import cube8540.book.api.book.domain.defaultSmallThumbnail
@@ -23,8 +28,23 @@ import org.springframework.data.domain.Sort
 val defaultPublishFrom: LocalDate = LocalDate.of(2021, 6, 1)
 val defaultPublishTo: LocalDate = LocalDate.of(2021, 6, 30)
 
-val bookDetailsAssertIgnoreFields = listOf(BookDetails::createdAt.name, BookDetails::updatedAt.name).toTypedArray()
+val defaultExternalLinkPostRequest = mutableMapOf(
+    MappingType.ALADIN to createBookExternalLinkPostRequest(),
+    MappingType.KYOBO to createBookExternalLinkPostRequest()
+)
+
+val bookDetailsAssertIgnoreFields = listOf(BookDetail::createdAt.name, BookDetail::updatedAt.name).toTypedArray()
 val publisherDetailsAssertIgnoreFields = listOf(PublisherDetails::createdAt.name, PublisherDetails::updatedAt.name).toTypedArray()
+
+fun createBookExternalLinkPostRequest(
+    productDetailPage: URI = defaultLinkUri,
+    originalPrice: Double? = defaultOriginalPrice,
+    salePrice: Double? = defaultSalePrice
+): BookExternalLinkPostRequest = BookExternalLinkPostRequest(
+    productDetailPage = productDetailPage,
+    originalPrice = originalPrice,
+    salePrice = salePrice
+)
 
 fun createBookPostRequest(
     isbn: String,
@@ -39,7 +59,7 @@ fun createBookPostRequest(
     authors: MutableSet<String>? = defaultAuthors,
     description: String? = defaultDescription,
     indexes: MutableList<String>? = defaultIndexes,
-    price: Double? = defaultPrice
+    externalLinks: MutableMap<MappingType, BookExternalLinkPostRequest>? = defaultExternalLinkPostRequest
 ): BookPostRequest = BookPostRequest(
     isbn = isbn,
     title = title,
@@ -53,7 +73,7 @@ fun createBookPostRequest(
     authors = authors,
     description = description,
     indexes = indexes,
-    price = price
+    externalLinks = externalLinks
 )
 
 fun createBookLookupCondition(
@@ -102,8 +122,8 @@ fun createBookDetails(
     authors: MutableSet<String>? = defaultAuthors,
     description: String? = defaultDescription,
     indexes: MutableList<String>? = defaultIndexes,
-    price: Double? = defaultPrice
-): BookDetails = BookDetails(
+    externalLinks: MutableMap<MappingType, BookExternalLinkDetail>? = defaultExternalLinks.mapValues { BookExternalLinkDetail.of(it.value) }.toMutableMap()
+): BookDetail = BookDetail(
     isbn = isbn,
     title = title,
     publisher = createPublisherDetails(publisherCode, publisherName),
@@ -113,7 +133,7 @@ fun createBookDetails(
     authors = authors,
     description = description,
     indexes = indexes,
-    price = price
+    externalLinks = externalLinks
 )
 
 fun createPublisherDetails(

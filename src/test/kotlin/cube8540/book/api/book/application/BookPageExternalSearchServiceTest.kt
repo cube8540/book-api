@@ -87,7 +87,7 @@ internal class BookPageExternalSearchServiceTest {
         assertThat(results.content)
             .usingRecursiveFieldByFieldElementComparator()
             .usingElementComparatorIgnoringFields(*bookDetailsAssertIgnoreFields)
-            .usingComparatorForElementFieldsWithNames(IgnoringFieldsComparator(*publisherDetailsAssertIgnoreFields), BookDetails::publisher.name)
+            .usingComparatorForElementFieldsWithNames(IgnoringFieldsComparator(*publisherDetailsAssertIgnoreFields), BookDetail::publisher.name)
             .containsExactly(createBookDetails(isbn = "isbn00001"), createBookDetails("isbn00002"), createBookDetails("isbn00003"))
     }
 
@@ -113,7 +113,7 @@ internal class BookPageExternalSearchServiceTest {
         assertThat(results.content)
             .usingRecursiveFieldByFieldElementComparator()
             .usingElementComparatorIgnoringFields(*bookDetailsAssertIgnoreFields)
-            .usingComparatorForElementFieldsWithNames(IgnoringFieldsComparator(*publisherDetailsAssertIgnoreFields), BookDetails::publisher.name)
+            .usingComparatorForElementFieldsWithNames(IgnoringFieldsComparator(*publisherDetailsAssertIgnoreFields), BookDetail::publisher.name)
             .containsExactly(createBookDetails(isbn = "isbn00001"), createBookDetails("isbn00002"), createBookDetails("isbn00003"))
     }
 }
