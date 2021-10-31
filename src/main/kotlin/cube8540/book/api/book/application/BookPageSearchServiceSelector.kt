@@ -10,11 +10,11 @@ import org.springframework.stereotype.Service
 class BookPageSearchServiceSelector @Autowired constructor(
     private val applicationContext: ApplicationContext
 ): BookPageSearchService {
-    override fun lookupBooks(condition: BookLookupCondition, pageable: Pageable): Page<BookDetail> {
+    override fun searchBooks(condition: BookLookupCondition, pageable: Pageable): Page<BookDetail> {
         return if (condition.title != null) {
-            applicationContext.getBean(BookPageExternalSearchService::class.java).lookupBooks(condition, pageable)
+            applicationContext.getBean(BookPageExternalSearchService::class.java).searchBooks(condition, pageable)
         } else {
-            applicationContext.getBean(ApplicationBookService::class.java).lookupBooks(condition, pageable)
+            applicationContext.getBean(ApplicationBookService::class.java).searchBooks(condition, pageable)
         }
     }
 }

@@ -37,7 +37,7 @@ internal class BookPageExternalSearchServiceTest {
         val condition = createBookLookupCondition(title = null)
         val pageable = PageRequest.of(randomPage, randomSize)
 
-        val thrown = catchThrowable { service.lookupBooks(condition, pageable) }
+        val thrown = catchThrowable { service.searchBooks(condition, pageable) }
         assertThat(thrown).isInstanceOf(BookInvalidException::class.java)
         assertThat((thrown as BookInvalidException).errors)
             .containsExactly(ValidationError(service.titlePropertyName, service.titleNullErrorMessage))
@@ -57,7 +57,7 @@ internal class BookPageExternalSearchServiceTest {
         val isbnList = listOf(Isbn("isbn00001"), Isbn("isbn00002"), Isbn("isbn00003"))
         every { externalSearchExchanger.search(capture(captor), pageable) } returns PageImpl(isbnList, pageable, randomTotalSize)
 
-        service.lookupBooks(condition, pageable)
+        service.searchBooks(condition, pageable)
         val expectedExternalSearchRequest = createExternalSearchRequest(
             title = defaultTitle, from = defaultPublishFrom, to = defaultPublishTo, publisherCode = defaultPublisherCode)
         assertThat(captor.captured).isEqualToComparingFieldByField(expectedExternalSearchRequest)
@@ -81,7 +81,7 @@ internal class BookPageExternalSearchServiceTest {
         every { externalSearchExchanger.search(externalSearchRequest, pageable) } returns PageImpl(isbnList, pageable, randomTotalSize)
         every { bookRepository.findDetailsByIsbn(isbnList) } returns books
 
-        val results = service.lookupBooks(condition, pageable)
+        val results = service.searchBooks(condition, pageable)
         assertThat(results.pageable).isEqualTo(pageable)
         assertThat(results.totalElements).isEqualTo(randomTotalSize)
         assertThat(results.content)
@@ -109,7 +109,7 @@ internal class BookPageExternalSearchServiceTest {
         every { externalSearchExchanger.search(externalSearchRequest, pageable) } returns PageImpl(isbnList, pageable, randomTotalSize)
         every { bookRepository.findDetailsByIsbn(isbnList) } returns books
 
-        val results = service.lookupBooks(condition, pageable)
+        val results = service.searchBooks(condition, pageable)
         assertThat(results.content)
             .usingRecursiveFieldByFieldElementComparator()
             .usingElementComparatorIgnoringFields(*bookDetailsAssertIgnoreFields)

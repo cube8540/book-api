@@ -41,10 +41,10 @@ internal class ApplicationBookServiceTest {
     }
 
     @Nested
-    inner class LookupBookTest {
+    inner class SearchBookTest {
 
         @Test
-        fun `lookup book details`() {
+        fun `search book details`() {
             val condition = createBookLookupCondition(direction = Sort.Direction.ASC)
             val pageRequest = PageRequest.of(0, 10)
 
@@ -56,7 +56,7 @@ internal class ApplicationBookServiceTest {
 
             every { bookRepository.findPageByCondition(expectedCondition, expectedPageRequest) } returns PageImpl(books, expectedPageRequest, books.size.toLong())
 
-            val results = service.lookupBooks(condition, pageRequest)
+            val results = service.searchBooks(condition, pageRequest)
             assertThat(results.totalElements).isEqualTo(books.size.toLong())
             assertThat(results.pageable).isEqualTo(expectedPageRequest)
             assertThat(results.content)

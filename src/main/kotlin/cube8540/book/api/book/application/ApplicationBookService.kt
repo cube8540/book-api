@@ -26,7 +26,7 @@ class ApplicationBookService constructor(
     lateinit var validatorFactory: BookValidatorFactory
 
     @Transactional(readOnly = true)
-    override fun lookupBooks(condition: BookLookupCondition, pageable: Pageable): Page<BookDetail> {
+    override fun searchBooks(condition: BookLookupCondition, pageable: Pageable): Page<BookDetail> {
         val queryCondition = BookQueryCondition(
             publishFrom = condition.publishFrom,
             publishTo = condition.publishTo,

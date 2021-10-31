@@ -22,5 +22,5 @@ data class BookLookupCondition(
 )
 
 interface BookPageSearchService {
-    fun lookupBooks(condition: BookLookupCondition, pageable: Pageable): Page<BookDetail>
+    fun searchBooks(condition: BookLookupCondition, pageable: Pageable): Page<BookDetail>
 }

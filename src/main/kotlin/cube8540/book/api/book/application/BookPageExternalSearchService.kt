@@ -23,7 +23,7 @@ class BookPageExternalSearchService @Autowired constructor(
     var titleNullErrorMessage = "title must not be null"
 
     @Transactional
-    override fun lookupBooks(condition: BookLookupCondition, pageable: Pageable): Page<BookDetail> {
+    override fun searchBooks(condition: BookLookupCondition, pageable: Pageable): Page<BookDetail> {
         val title = condition.title
             ?: throw BookInvalidException.instance(listOf(ValidationError(Book::title.name, "title must not be null")))
 
