@@ -1,6 +1,9 @@
 package cube8540.book.api.book.application
 
-import cube8540.book.api.book.domain.*
+import cube8540.book.api.book.domain.Book
+import cube8540.book.api.book.domain.BookValidatorFactory
+import cube8540.book.api.book.domain.Isbn
+import cube8540.book.api.book.domain.Series
 import cube8540.book.api.book.infra.BookPostRequestBasedInitializer
 import cube8540.book.api.book.repository.BookQueryCondition
 import cube8540.book.api.book.repository.BookRepository
@@ -32,7 +35,7 @@ class ApplicationBookService constructor(
             seriesIsbn = condition.seriesIsbn
         )
         val pageRequest = PageRequest.of(pageable.pageNumber, pageable.pageSize)
-            .withSort(Sort.by(condition.direction, QBook.book.publishDate.metadata.name))
+            .withSort(Sort.by(condition.direction, Book::publishDate.name))
 
         val page = bookRepository.findPageByCondition(queryCondition, pageRequest)
         return page.map { BookDetail.withoutCollection(it) }

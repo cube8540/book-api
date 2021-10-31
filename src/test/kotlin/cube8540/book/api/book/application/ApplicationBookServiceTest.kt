@@ -4,7 +4,6 @@ import cube8540.book.api.book.domain.Book
 import cube8540.book.api.book.domain.BookValidatorFactory
 import cube8540.book.api.book.domain.Isbn
 import cube8540.book.api.book.domain.Publisher
-import cube8540.book.api.book.domain.QBook
 import cube8540.book.api.book.domain.Series
 import cube8540.book.api.book.domain.bookAssertIgnoreFields
 import cube8540.book.api.book.domain.createBook
@@ -53,7 +52,7 @@ internal class ApplicationBookServiceTest {
                 createBook(isbn = "isbn0001", publisher = createPublisher()),
                 createBook(isbn = "isbn0002", publisher = createPublisher()))
             val expectedCondition = createBookQueryCondition()
-            val expectedPageRequest = pageRequest.withSort(Sort.by(Sort.Direction.ASC, QBook.book.publishDate.metadata.name))
+            val expectedPageRequest = pageRequest.withSort(Sort.by(Sort.Direction.ASC, Book::publishDate.name))
 
             every { bookRepository.findPageByCondition(expectedCondition, expectedPageRequest) } returns PageImpl(books, expectedPageRequest, books.size.toLong())
 
