@@ -24,6 +24,10 @@ interface BookCustomRepository {
     fun findDetailsByIsbn(isbnList: Collection<Isbn>): List<Book>
 
     fun findPageByCondition(condition: BookQueryCondition, pageRequest: PageRequest): Page<Book>
+
+    fun findByPublishDate(date: LocalDate, pageRequest: PageRequest): Page<Book>
+
+    fun findAll(pageRequest: PageRequest): Page<Book>
 }
 
 interface BookRepository: JpaRepository<Book, Isbn>, BookCustomRepository

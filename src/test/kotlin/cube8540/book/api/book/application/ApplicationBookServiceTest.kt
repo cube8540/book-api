@@ -1,10 +1,10 @@
 package cube8540.book.api.book.application
 
+import cube8540.book.api.BookApiApplication
 import cube8540.book.api.book.domain.Book
 import cube8540.book.api.book.domain.BookValidatorFactory
 import cube8540.book.api.book.domain.Isbn
 import cube8540.book.api.book.domain.Publisher
-import cube8540.book.api.book.domain.QBook
 import cube8540.book.api.book.domain.Series
 import cube8540.book.api.book.domain.bookAssertIgnoreFields
 import cube8540.book.api.book.domain.createBook
@@ -13,13 +13,18 @@ import cube8540.book.api.book.domain.defaultPublisherCode
 import cube8540.book.api.book.repository.BookRepository
 import cube8540.book.api.book.repository.PublisherRepository
 import cube8540.book.api.createValidationResults
+import cube8540.book.api.toDefaultInstant
 import io.github.cube8540.validator.core.ValidationError
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import java.time.Clock
+import java.time.LocalDate
+import kotlin.random.Random
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
+import org.assertj.core.api.ListAssert
 import org.assertj.core.internal.IgnoringFieldsComparator
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -42,10 +47,10 @@ internal class ApplicationBookServiceTest {
     }
 
     @Nested
-    inner class LookupBookTest {
+    inner class SearchBookTest {
 
         @Test
-        fun `lookup book details`() {
+        fun `search book details`() {
             val condition = createBookLookupCondition(direction = Sort.Direction.ASC)
             val pageRequest = PageRequest.of(0, 10)
 
@@ -53,17 +58,14 @@ internal class ApplicationBookServiceTest {
                 createBook(isbn = "isbn0001", publisher = createPublisher()),
                 createBook(isbn = "isbn0002", publisher = createPublisher()))
             val expectedCondition = createBookQueryCondition()
-            val expectedPageRequest = pageRequest.withSort(Sort.by(Sort.Direction.ASC, QBook.book.publishDate.metadata.name))
+            val expectedPageRequest = pageRequest.withSort(Sort.by(Sort.Direction.ASC, Book::publishDate.name))
 
             every { bookRepository.findPageByCondition(expectedCondition, expectedPageRequest) } returns PageImpl(books, expectedPageRequest, books.size.toLong())
 
-            val results = service.lookupBooks(condition, pageRequest)
+            val results = service.searchBooks(condition, pageRequest)
             assertThat(results.totalElements).isEqualTo(books.size.toLong())
             assertThat(results.pageable).isEqualTo(expectedPageRequest)
-            assertThat(results.content)
-                .usingRecursiveFieldByFieldElementComparator()
-                .usingElementComparatorIgnoringFields(*bookDetailsAssertIgnoreFields)
-                .usingComparatorForElementFieldsWithNames(IgnoringFieldsComparator(*publisherDetailsAssertIgnoreFields), BookDetail::publisher.name)
+            bookDetailsAssertThat(results.content)
                 .containsExactly(createBookDetails(isbn = "isbn0000", authors = null, indexes = null, externalLinks = null),
                     createBookDetails(isbn = "isbn0001", authors = null, indexes = null, externalLinks = null),
                     createBookDetails(isbn = "isbn0002", authors = null, indexes = null, externalLinks = null))
@@ -236,4 +238,169 @@ internal class ApplicationBookServiceTest {
                 .containsExactly(createBookDetails(isbn = "isbn00000"), createBookDetails(isbn = "isbn00001"), createBookDetails(isbn = "isbn00002"))
         }
     }
+
+    @Nested
+    inner class LookupForNewestBook {
+
+        @Test
+        fun `request page bigger then maximum page`() {
+            val randomPage = Random.nextInt(6, Int.MAX_VALUE)
+            val randomSize = Random.nextInt(1, Int.MAX_VALUE)
+            val pageRequest = PageRequest.of(randomPage, randomSize)
+
+            val books = listOf(createBook(isbn = "isbn0000", publisher = createPublisher()),
+                createBook(isbn = "isbn0001", publisher = createPublisher()),
+                createBook(isbn = "isbn0002", publisher = createPublisher()))
+            val randomTotalElements = Random.nextLong(randomSize.toLong(), Long.MAX_VALUE)
+            val expectedPageRequest = PageRequest.of(5, randomSize)
+                .withSort(Sort.by(Sort.Order.desc(Book::createdAt.name)))
+
+            every { bookRepository.findAll(expectedPageRequest) } returns PageImpl(books, expectedPageRequest, randomTotalElements)
+
+            val results = service.lookupForNewestBook(pageRequest)
+            assertThat(results.totalElements).isEqualTo(randomTotalElements)
+            assertThat(results.pageable).isEqualTo(expectedPageRequest)
+            bookDetailsAssertThat(results.content)
+                .containsExactly(createBookDetails(isbn = "isbn0000", authors = null, indexes = null, externalLinks = null),
+                    createBookDetails(isbn = "isbn0001", authors = null, indexes = null, externalLinks = null),
+                    createBookDetails(isbn = "isbn0002", authors = null, indexes = null, externalLinks = null))
+        }
+
+        @Test
+        fun `lookup books`() {
+            val randomPage = Random.nextInt(0, MAXIMUM_LOOKUP_PAGE)
+            val randomSize = Random.nextInt(1, Int.MAX_VALUE)
+            val pageRequest = PageRequest.of(randomPage, randomSize)
+
+            val books = listOf(createBook(isbn = "isbn0000", publisher = createPublisher()),
+                createBook(isbn = "isbn0001", publisher = createPublisher()),
+                createBook(isbn = "isbn0002", publisher = createPublisher()))
+            val randomTotalElements = Random.nextLong(randomSize.toLong(), Long.MAX_VALUE)
+            val expectedPageRequest = pageRequest.withSort(Sort.by(Sort.Order.desc(Book::createdAt.name)))
+
+            every { bookRepository.findAll(expectedPageRequest) } returns PageImpl(books, expectedPageRequest, randomTotalElements)
+
+            val results = service.lookupForNewestBook(pageRequest)
+            assertThat(results.totalElements).isEqualTo(randomTotalElements)
+            assertThat(results.pageable).isEqualTo(expectedPageRequest)
+            bookDetailsAssertThat(results.content)
+                .containsExactly(createBookDetails(isbn = "isbn0000", authors = null, indexes = null, externalLinks = null),
+                    createBookDetails(isbn = "isbn0001", authors = null, indexes = null, externalLinks = null),
+                    createBookDetails(isbn = "isbn0002", authors = null, indexes = null, externalLinks = null))
+        }
+    }
+
+    @Nested
+    inner class LookupForLatestUpdate {
+
+        @Test
+        fun `request page bigger then maximum page`() {
+            val randomPage = Random.nextInt(6, Int.MAX_VALUE)
+            val randomSize = Random.nextInt(1, Int.MAX_VALUE)
+            val pageRequest = PageRequest.of(randomPage, randomSize)
+
+            val books = listOf(createBook(isbn = "isbn0000", publisher = createPublisher()),
+                createBook(isbn = "isbn0001", publisher = createPublisher()),
+                createBook(isbn = "isbn0002", publisher = createPublisher()))
+            val randomTotalElements = Random.nextLong(randomSize.toLong(), Long.MAX_VALUE)
+            val expectedPageRequest = PageRequest.of(5, randomSize)
+                .withSort(Sort.by(Sort.Order.desc(Book::updatedAt.name)))
+
+            every { bookRepository.findAll(expectedPageRequest) } returns PageImpl(books, expectedPageRequest, randomTotalElements)
+
+            val results = service.lookupForLatestUpdate(pageRequest)
+            assertThat(results.totalElements).isEqualTo(randomTotalElements)
+            assertThat(results.pageable).isEqualTo(expectedPageRequest)
+            bookDetailsAssertThat(results.content)
+                .containsExactly(createBookDetails(isbn = "isbn0000", authors = null, indexes = null, externalLinks = null),
+                    createBookDetails(isbn = "isbn0001", authors = null, indexes = null, externalLinks = null),
+                    createBookDetails(isbn = "isbn0002", authors = null, indexes = null, externalLinks = null))
+        }
+
+        @Test
+        fun `lookup books`() {
+            val randomPage = Random.nextInt(0, MAXIMUM_LOOKUP_PAGE)
+            val randomSize = Random.nextInt(1, Int.MAX_VALUE)
+            val pageRequest = PageRequest.of(randomPage, randomSize)
+
+            val books = listOf(createBook(isbn = "isbn0000", publisher = createPublisher()),
+                createBook(isbn = "isbn0001", publisher = createPublisher()),
+                createBook(isbn = "isbn0002", publisher = createPublisher()))
+            val randomTotalElements = Random.nextLong(randomSize.toLong(), Long.MAX_VALUE)
+            val expectedPageRequest = pageRequest.withSort(Sort.by(Sort.Order.desc(Book::updatedAt.name)))
+
+            every { bookRepository.findAll(expectedPageRequest) } returns PageImpl(books, expectedPageRequest, randomTotalElements)
+
+            val results = service.lookupForLatestUpdate(pageRequest)
+            assertThat(results.totalElements).isEqualTo(randomTotalElements)
+            assertThat(results.pageable).isEqualTo(expectedPageRequest)
+            bookDetailsAssertThat(results.content)
+                .containsExactly(createBookDetails(isbn = "isbn0000", authors = null, indexes = null, externalLinks = null),
+                    createBookDetails(isbn = "isbn0001", authors = null, indexes = null, externalLinks = null),
+                    createBookDetails(isbn = "isbn0002", authors = null, indexes = null, externalLinks = null))
+        }
+    }
+
+    @Nested
+    inner class LookupForPublishedToday {
+
+        @Test
+        fun `request page bigger then maximum page`() {
+            val randomPage = Random.nextInt(6, Int.MAX_VALUE)
+            val randomSize = Random.nextInt(1, Int.MAX_VALUE)
+            val randomLocalDate = randomLocalDate()
+            val pageRequest = PageRequest.of(randomPage, randomSize)
+
+            val books = listOf(createBook(isbn = "isbn0000", publisher = createPublisher()),
+                createBook(isbn = "isbn0001", publisher = createPublisher()),
+                createBook(isbn = "isbn0002", publisher = createPublisher()))
+            val randomTotalElements = Random.nextLong(randomSize.toLong(), Long.MAX_VALUE)
+            val expectedPageRequest = PageRequest.of(5, randomSize)
+                .withSort(Sort.by(Sort.Order.desc(Book::createdAt.name)))
+
+            ApplicationBookService.clock = Clock.fixed(randomLocalDate.toDefaultInstant(), BookApiApplication.DEFAULT_TIME_ZONE.toZoneId())
+            every { bookRepository.findByPublishDate(randomLocalDate, expectedPageRequest) } returns PageImpl(books, expectedPageRequest, randomTotalElements)
+
+            val results = service.lookupForPublishedToday(pageRequest)
+            assertThat(results.totalElements).isEqualTo(randomTotalElements)
+            assertThat(results.pageable).isEqualTo(expectedPageRequest)
+            bookDetailsAssertThat(results.content)
+                .containsExactly(createBookDetails(isbn = "isbn0000", authors = null, indexes = null, externalLinks = null),
+                    createBookDetails(isbn = "isbn0001", authors = null, indexes = null, externalLinks = null),
+                    createBookDetails(isbn = "isbn0002", authors = null, indexes = null, externalLinks = null))
+        }
+
+        @Test
+        fun `lookup books`() {
+            val randomPage = Random.nextInt(0, MAXIMUM_LOOKUP_PAGE)
+            val randomSize = Random.nextInt(1, Int.MAX_VALUE)
+            val randomLocalDate = randomLocalDate()
+            val pageRequest = PageRequest.of(randomPage, randomSize)
+
+            val books = listOf(createBook(isbn = "isbn0000", publisher = createPublisher()),
+                createBook(isbn = "isbn0001", publisher = createPublisher()),
+                createBook(isbn = "isbn0002", publisher = createPublisher()))
+            val randomTotalElements = Random.nextLong(randomSize.toLong(), Long.MAX_VALUE)
+            val expectedPageRequest = pageRequest.withSort(Sort.by(Sort.Order.desc(Book::createdAt.name)))
+
+            ApplicationBookService.clock = Clock.fixed(randomLocalDate.toDefaultInstant(), BookApiApplication.DEFAULT_TIME_ZONE.toZoneId())
+            every { bookRepository.findByPublishDate(randomLocalDate, expectedPageRequest) } returns PageImpl(books, expectedPageRequest, randomTotalElements)
+
+            val results = service.lookupForPublishedToday(pageRequest)
+            assertThat(results.totalElements).isEqualTo(randomTotalElements)
+            assertThat(results.pageable).isEqualTo(expectedPageRequest)
+            bookDetailsAssertThat(results.content)
+                .containsExactly(createBookDetails(isbn = "isbn0000", authors = null, indexes = null, externalLinks = null),
+                    createBookDetails(isbn = "isbn0001", authors = null, indexes = null, externalLinks = null),
+                    createBookDetails(isbn = "isbn0002", authors = null, indexes = null, externalLinks = null))
+        }
+    }
+
+    private fun bookDetailsAssertThat(books: List<BookDetail>): ListAssert<BookDetail> = assertThat(books)
+        .usingRecursiveFieldByFieldElementComparator()
+        .usingElementComparatorIgnoringFields(*bookDetailsAssertIgnoreFields)
+        .usingComparatorForElementFieldsWithNames(IgnoringFieldsComparator(*publisherDetailsAssertIgnoreFields), BookDetail::publisher.name)
+
+    private fun randomLocalDate(): LocalDate =
+        LocalDate.ofEpochDay(Random.nextLong(LocalDate.of(1970, 1, 1).toEpochDay(), LocalDate.MAX.toEpochDay()))
 }

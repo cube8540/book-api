@@ -36,3 +36,9 @@ data class BookDetailResponseV1(
     var updatedAt: LocalDateTime?,
     var seriesList: List<BookDetailResponseV1>?
 )
+
+data class SummaryBookStatusResponseV1(
+    var newestBooks: List<BookDetailResponseV1>,
+    var latestUpdate: List<BookDetailResponseV1>,
+    var publishedToday: List<BookDetailResponseV1>
+)
