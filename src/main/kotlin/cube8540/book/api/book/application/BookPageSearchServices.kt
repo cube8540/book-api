@@ -1,7 +1,9 @@
 package cube8540.book.api.book.application
 
-import org.springframework.data.domain.Sort
 import java.time.LocalDate
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 
 data class BookLookupCondition(
     var publishFrom: LocalDate? = null,
@@ -18,3 +20,7 @@ data class BookLookupCondition(
 
     var direction: Sort.Direction = Sort.Direction.DESC,
 )
+
+interface BookPageSearchService {
+    fun lookupBooks(condition: BookLookupCondition, pageable: Pageable): Page<BookDetail>
+}

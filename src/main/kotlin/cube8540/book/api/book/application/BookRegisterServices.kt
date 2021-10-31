@@ -1,6 +1,7 @@
 package cube8540.book.api.book.application
 
 import cube8540.book.api.book.domain.MappingType
+import io.github.cube8540.validator.core.ValidationError
 import java.net.URI
 import java.time.LocalDate
 
@@ -43,6 +44,11 @@ data class BookExternalLinkPostRequest(
 data class BookPostResult(
     var successBooks: List<String>,
     var failedBooks: List<BookPostErrorReason>
+)
+
+data class BookPostErrorReason(
+    var isbn: String,
+    var errors: List<ValidationError>
 )
 
 interface BookRegisterService {
