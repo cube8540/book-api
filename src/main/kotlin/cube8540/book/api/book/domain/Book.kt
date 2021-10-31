@@ -116,8 +116,7 @@ class Book(
     fun mergeBook(book: Book) {
         this.title = book.title
         this.publishDate = book.publishDate
-
-        book.description?.let { this.description = it }
+        this.description = book.description
 
         if (book.indexes != null && this.indexes != book.indexes) {
             this.indexes = book.indexes
