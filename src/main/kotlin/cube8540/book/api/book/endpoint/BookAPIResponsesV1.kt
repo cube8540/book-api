@@ -1,6 +1,7 @@
 package cube8540.book.api.book.endpoint
 
 import cube8540.book.api.book.application.BookPostErrorReason
+import cube8540.book.api.book.domain.MappingType
 import java.net.URI
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -10,7 +11,13 @@ data class BookPostResponseV1(
     var failedBooks: List<BookPostErrorReason> = emptyList()
 )
 
-data class BookDetailsResponseV1(
+data class BookExternalLinkResponseV1(
+    var productDetailPage: URI,
+    var originalPrice: Double? = null,
+    var salePrice: Double? = null
+)
+
+data class BookDetailResponseV1(
     var isbn: String,
     var title: String,
     var publishDate: LocalDate,
@@ -24,8 +31,14 @@ data class BookDetailsResponseV1(
     var authors: Set<String>?,
     var description: String?,
     var indexes: List<String>?,
-    var price: Double?,
+    var externalLinks: Map<MappingType, BookExternalLinkResponseV1>? = null,
     var createdAt: LocalDateTime?,
     var updatedAt: LocalDateTime?,
-    var seriesList: List<BookDetailsResponseV1>?
+    var seriesList: List<BookDetailResponseV1>?
+)
+
+data class SummaryBookStatusResponseV1(
+    var newestBooks: List<BookDetailResponseV1>,
+    var latestUpdate: List<BookDetailResponseV1>,
+    var publishedToday: List<BookDetailResponseV1>
 )

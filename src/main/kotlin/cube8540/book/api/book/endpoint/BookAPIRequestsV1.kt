@@ -1,5 +1,6 @@
 package cube8540.book.api.book.endpoint
 
+import cube8540.book.api.book.domain.MappingType
 import java.beans.ConstructorProperties
 import java.net.URI
 import java.time.LocalDate
@@ -9,6 +10,16 @@ data class BookRegisterRequestV1
 @ConstructorProperties(value = ["requests"])
 constructor(
     var requests: List<BookPostRequestV1>
+)
+
+data class BookExternalLinkRegisterRequestV1
+@ConstructorProperties(value = ["productDetailPage", "originalPrice", "salePrice"])
+constructor(
+    var productDetailPage: URI,
+
+    var originalPrice: Double?,
+
+    var salePrice: Double?
 )
 
 data class BookPostRequestV1
@@ -25,7 +36,7 @@ data class BookPostRequestV1
     "authors",
     "description",
     "indexes",
-    "price"
+    "externalLinks"
 ])
 constructor(
     var isbn: String,
@@ -52,7 +63,7 @@ constructor(
 
     var indexes: MutableList<String>?,
 
-    var price: Double?
+    var externalLinks: MutableMap<MappingType, BookExternalLinkRegisterRequestV1>?
 )
 
 data class BookLookupRequestV1
