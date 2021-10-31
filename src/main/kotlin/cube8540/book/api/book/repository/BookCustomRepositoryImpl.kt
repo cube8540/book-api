@@ -5,12 +5,12 @@ import cube8540.book.api.book.domain.Book
 import cube8540.book.api.book.domain.Isbn
 import cube8540.book.api.book.domain.QBook
 import cube8540.book.api.book.domain.Series
+import java.time.LocalDate
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 import org.springframework.stereotype.Repository
-import java.time.LocalDate
 
 @Repository
 class BookCustomRepositoryImpl : BookCustomRepository, QuerydslRepositorySupport(Book::class.java) {
@@ -48,6 +48,27 @@ class BookCustomRepositoryImpl : BookCustomRepository, QuerydslRepositorySupport
                 seriesEqual(condition.seriesIsbn, condition.seriesCode),
                 publisherEqual(condition.publisherCode)
             )
+        querydsl!!.applyPagination(pageRequest, queryExpression)
+
+        val queryResults = queryExpression.fetchResults()
+
+        return PageImpl(queryResults.results, pageRequest, queryResults.total)
+    }
+
+    override fun findByPublishDate(date: LocalDate, pageRequest: PageRequest): Page<Book> {
+        val queryExpression = from(book)
+            .leftJoin(book.publisher).fetchJoin()
+            .where(publishDateBetween(date, date))
+        querydsl!!.applyPagination(pageRequest, queryExpression)
+
+        val queryResults = queryExpression.fetchResults()
+
+        return PageImpl(queryResults.results, pageRequest, queryResults.total)
+    }
+
+    override fun findAll(pageRequest: PageRequest): Page<Book> {
+        val queryExpression = from(book)
+            .leftJoin(book.publisher).fetchJoin()
         querydsl!!.applyPagination(pageRequest, queryExpression)
 
         val queryResults = queryExpression.fetchResults()
