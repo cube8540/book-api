@@ -93,20 +93,6 @@ internal class BookTest {
         }
 
         @Test
-        fun `book change description when given description is null`() {
-            val originalDescription = "originalDescription00001"
-
-            val description = null
-            val book: Book = mockk(relaxed = true)
-
-            bookBase.description = originalDescription
-            every { book.description } returns description
-
-            bookBase.mergeBook(book)
-            assertThat(bookBase.description).isEqualTo(originalDescription)
-        }
-
-        @Test
         fun `book change description`() {
             val originalDescription = "originalDescription00001"
 
