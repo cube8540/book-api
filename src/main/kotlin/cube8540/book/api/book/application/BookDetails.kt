@@ -32,7 +32,8 @@ data class BookDetail(
     val indexes: List<String>? = null,
     val externalLinks: Map<MappingType, BookExternalLinkDetail>? = null,
     val createdAt: LocalDateTime? = null,
-    val updatedAt: LocalDateTime? = null
+    val updatedAt: LocalDateTime? = null,
+    val confirmedPublication: Boolean? = null
 ) {
     companion object {
         fun of(book: Book): BookDetail = BookDetail(
@@ -47,7 +48,8 @@ data class BookDetail(
             indexes = book.indexes?.toList(),
             externalLinks = book.externalLinks?.mapValues { BookExternalLinkDetail.of(it.value) },
             createdAt = book.createdAt,
-            updatedAt = book.updatedAt
+            updatedAt = book.updatedAt,
+            confirmedPublication = book.confirmedPublication
         )
 
         fun withoutCollection(book: Book): BookDetail = BookDetail(
@@ -59,7 +61,8 @@ data class BookDetail(
             thumbnail = book.thumbnail,
             description = book.description,
             createdAt = book.createdAt,
-            updatedAt = book.updatedAt
+            updatedAt = book.updatedAt,
+            confirmedPublication = book.confirmedPublication
         )
     }
 }

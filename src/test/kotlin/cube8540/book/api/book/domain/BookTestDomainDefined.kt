@@ -51,6 +51,7 @@ fun createBook(
     description: String? = defaultDescription,
     indexes: MutableList<String>? = defaultIndexes,
     externalLinks: MutableMap<MappingType, BookExternalLink>? = defaultExternalLinks,
+    confirmedPublication: Boolean = false,
     newObject: Boolean = true
 ): Book {
     val book = Book(
@@ -66,6 +67,7 @@ fun createBook(
     book.description = description
     book.indexes = indexes
     book.externalLinks = externalLinks
+    book.confirmedPublication = confirmedPublication
 
     if (!newObject) {
         book.markingLoadOnRepository()
