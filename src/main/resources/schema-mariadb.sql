@@ -27,6 +27,7 @@ create index if not exists book_series_code_index on books (series_code);
 create index if not exists book_series_isbn_index on books (series_isbn);
 alter table books change column created_at created_at timestamp not null default current_timestamp;
 alter table books change column updated_at updated_at timestamp not null default current_timestamp;
+alter table books add column if not exists confirmed_publication boolean default false;
 alter table books drop column if exists price;
 
 create table if not exists book_external_links (

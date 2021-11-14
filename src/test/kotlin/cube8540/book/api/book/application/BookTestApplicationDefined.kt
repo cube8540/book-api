@@ -59,7 +59,8 @@ fun createBookPostRequest(
     authors: MutableSet<String>? = defaultAuthors,
     description: String? = defaultDescription,
     indexes: MutableList<String>? = defaultIndexes,
-    externalLinks: MutableMap<MappingType, BookExternalLinkPostRequest>? = defaultExternalLinkPostRequest
+    externalLinks: MutableMap<MappingType, BookExternalLinkPostRequest>? = defaultExternalLinkPostRequest,
+    confirmedPublication: Boolean? = null
 ): BookPostRequest = BookPostRequest(
     isbn = isbn,
     title = title,
@@ -73,7 +74,8 @@ fun createBookPostRequest(
     authors = authors,
     description = description,
     indexes = indexes,
-    externalLinks = externalLinks
+    externalLinks = externalLinks,
+    confirmedPublication = confirmedPublication
 )
 
 fun createBookLookupCondition(
@@ -122,7 +124,8 @@ fun createBookDetails(
     authors: MutableSet<String>? = defaultAuthors,
     description: String? = defaultDescription,
     indexes: MutableList<String>? = defaultIndexes,
-    externalLinks: MutableMap<MappingType, BookExternalLinkDetail>? = defaultExternalLinks.mapValues { BookExternalLinkDetail.of(it.value) }.toMutableMap()
+    externalLinks: MutableMap<MappingType, BookExternalLinkDetail>? = defaultExternalLinks.mapValues { BookExternalLinkDetail.of(it.value) }.toMutableMap(),
+    confirmedPublication: Boolean? = false
 ): BookDetail = BookDetail(
     isbn = isbn,
     title = title,
@@ -133,7 +136,8 @@ fun createBookDetails(
     authors = authors,
     description = description,
     indexes = indexes,
-    externalLinks = externalLinks
+    externalLinks = externalLinks,
+    confirmedPublication = confirmedPublication
 )
 
 fun createPublisherDetails(

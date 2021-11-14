@@ -31,7 +31,8 @@ data class BookDetailResponseV1(
     var authors: Set<String>?,
     var description: String?,
     var indexes: List<String>?,
-    var externalLinks: Map<MappingType, BookExternalLinkResponseV1>? = null,
+    var externalLinks: Map<MappingType, BookExternalLinkResponseV1>?,
+    var confirmedPublication: Boolean?,
     var createdAt: LocalDateTime?,
     var updatedAt: LocalDateTime?,
     var seriesList: List<BookDetailResponseV1>?

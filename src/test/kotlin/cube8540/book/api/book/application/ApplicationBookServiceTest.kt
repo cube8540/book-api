@@ -104,7 +104,7 @@ internal class ApplicationBookServiceTest {
             val requestList: List<BookPostRequest> = listOf(
                 createBookPostRequest(isbn = "isbn000001"),
                 createBookPostRequest(isbn = "isbn000002"),
-                createBookPostRequest(isbn = "isbn000003")
+                createBookPostRequest(isbn = "isbn000003", confirmedPublication = true)
             )
             val publisherReferenceMock: Publisher = mockk(relaxed = true)
             val insertedBookCaptor = slot<Iterable<Book>>()
@@ -121,7 +121,7 @@ internal class ApplicationBookServiceTest {
                 .usingElementComparatorIgnoringFields(*bookAssertIgnoreFields)
                 .containsExactly(createBook(isbn = "isbn000001", publisher = publisherReferenceMock),
                     createBook(isbn = "isbn000002", publisher = publisherReferenceMock),
-                    createBook(isbn = "isbn000003", publisher = publisherReferenceMock))
+                    createBook(isbn = "isbn000003", publisher = publisherReferenceMock, confirmedPublication = true))
             assertThat(result.successBooks).containsExactly("isbn000001", "isbn000002", "isbn000003")
         }
 
@@ -130,7 +130,7 @@ internal class ApplicationBookServiceTest {
             val requestList: List<BookPostRequest> = listOf(
                 createBookPostRequest(isbn = "isbn000001", title = "newTitle0001"),
                 createBookPostRequest(isbn = "isbn000002", title = "newTitle0002"),
-                createBookPostRequest(isbn = "isbn000003", title = "newTitle0003")
+                createBookPostRequest(isbn = "isbn000003", title = "newTitle0003", confirmedPublication = true)
             )
             val existsBooks = listOf(
                 createBook(isbn = "isbn000001", title = "beforeTitle0001", newObject = false),
@@ -150,7 +150,7 @@ internal class ApplicationBookServiceTest {
                 .usingElementComparatorIgnoringFields(*bookAssertIgnoreFields)
                 .containsExactly(createBook(isbn = "isbn000001", title = "newTitle0001", newObject = false),
                     createBook(isbn = "isbn000002", title = "newTitle0002", newObject = false),
-                    createBook(isbn = "isbn000003", title = "newTitle0003", newObject = false))
+                    createBook(isbn = "isbn000003", title = "newTitle0003", newObject = false, confirmedPublication = true))
             assertThat(result.successBooks).containsExactly("isbn000001", "isbn000002", "isbn000003")
         }
 
@@ -159,7 +159,7 @@ internal class ApplicationBookServiceTest {
             val requestList: List<BookPostRequest> = listOf(
                 createBookPostRequest(isbn = "isbn000001", title = "newTitle0001"),
                 createBookPostRequest(isbn = "isbn000002", title = "newTitle0002"),
-                createBookPostRequest(isbn = "isbn000003", title = "newTitle0003")
+                createBookPostRequest(isbn = "isbn000003", title = "newTitle0003", confirmedPublication = true)
             )
             val publisherReferenceMock: Publisher = mockk(relaxed = true)
             val existsBooks = listOf(createBook(isbn = "isbn000002", title = "beforeTitle0002", newObject = false))
@@ -177,7 +177,7 @@ internal class ApplicationBookServiceTest {
                 .usingElementComparatorIgnoringFields(*bookAssertIgnoreFields)
                 .containsExactly(createBook(isbn = "isbn000001", title = "newTitle0001", publisher = publisherReferenceMock),
                     createBook(isbn = "isbn000002", title = "newTitle0002", newObject = false),
-                    createBook(isbn = "isbn000003", title = "newTitle0003", publisher = publisherReferenceMock))
+                    createBook(isbn = "isbn000003", title = "newTitle0003", publisher = publisherReferenceMock, confirmedPublication = true))
             assertThat(result.successBooks).containsExactly("isbn000001", "isbn000002", "isbn000003")
         }
     }

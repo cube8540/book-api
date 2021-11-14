@@ -30,7 +30,9 @@ data class BookPostRequest(
 
     var indexes: MutableList<String>?,
 
-    var externalLinks: MutableMap<MappingType, BookExternalLinkPostRequest>?
+    var externalLinks: MutableMap<MappingType, BookExternalLinkPostRequest>?,
+
+    var confirmedPublication: Boolean?
 )
 
 data class BookExternalLinkPostRequest(

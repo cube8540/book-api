@@ -36,7 +36,8 @@ data class BookPostRequestV1
     "authors",
     "description",
     "indexes",
-    "externalLinks"
+    "externalLinks",
+    "confirmedPublication"
 ])
 constructor(
     var isbn: String,
@@ -63,7 +64,9 @@ constructor(
 
     var indexes: MutableList<String>?,
 
-    var externalLinks: MutableMap<MappingType, BookExternalLinkRegisterRequestV1>?
+    var externalLinks: MutableMap<MappingType, BookExternalLinkRegisterRequestV1>?,
+
+    var confirmedPublication: Boolean?
 )
 
 data class BookLookupRequestV1
