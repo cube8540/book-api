@@ -7,6 +7,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import java.time.LocalDate
+import kotlin.random.Random
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.assertj.core.api.Assertions.catchThrowable
@@ -104,6 +105,18 @@ internal class BookTest {
 
             bookBase.mergeBook(book)
             assertThat(bookBase.description).isEqualTo(description)
+        }
+
+        @Test
+        fun `book change confirmed publication`() {
+            val randomConfirmed = Random.nextBoolean()
+            val book: Book = mockk(relaxed = true)
+
+            bookBase.confirmedPublication = randomConfirmed
+            every { book.confirmedPublication } returns !randomConfirmed
+
+            bookBase.mergeBook(book)
+            assertThat(bookBase.confirmedPublication).isEqualTo(!randomConfirmed)
         }
 
         @Test

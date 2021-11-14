@@ -93,6 +93,9 @@ class Book(
     @Column(name = "updated_at", nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now(clock)
 
+    @Column(name = "confirmed_publication", nullable = false)
+    var confirmedPublication: Boolean = false
+
     @Transient
     var newObject: Boolean = true
         private set
@@ -117,6 +120,7 @@ class Book(
         this.title = book.title
         this.publishDate = book.publishDate
         this.description = book.description
+        this.confirmedPublication = book.confirmedPublication
 
         if (book.indexes != null && this.indexes != book.indexes) {
             this.indexes = book.indexes

@@ -34,9 +34,10 @@ fun createBookDetailsResponseV1(
     externalLinks: Map<MappingType, BookExternalLinkResponseV1>? = defaultExternalLinks.mapValues { convertToExternalLinkDetail(it.value) },
     createdAt: LocalDateTime? = null,
     updatedAt: LocalDateTime? = null,
-    seriesList: List<BookDetailResponseV1>? = emptyList()
+    seriesList: List<BookDetailResponseV1>? = emptyList(),
+    confirmedPublication: Boolean? = null
 ) = BookDetailResponseV1(isbn, title, publishDate, publisherCode, publisherName, seriesIsbn, seriesCode,
-    largeThumbnail, mediumThumbnail, smallThumbnail, authors, description, indexes, externalLinks, createdAt, updatedAt, seriesList)
+    largeThumbnail, mediumThumbnail, smallThumbnail, authors, description, indexes, externalLinks, confirmedPublication, createdAt, updatedAt, seriesList)
 
 private fun convertToExternalLinkDetail(link: BookExternalLink): BookExternalLinkResponseV1 =
     BookExternalLinkResponseV1(link.productDetailPage, link.originalPrice, link.salePrice)

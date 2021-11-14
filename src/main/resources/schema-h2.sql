@@ -24,6 +24,7 @@ create index if not exists book_publish_date_index on books (publish_date);
 create index if not exists book_series_code_index on books (series_code);
 create index if not exists book_series_isbn_index on books (series_isbn);
 alter table books drop column if exists price;
+alter table books add column if not exists confirmed_publication boolean default false;
 
 create table if not exists book_external_links (
     isbn varchar(13) not null,
