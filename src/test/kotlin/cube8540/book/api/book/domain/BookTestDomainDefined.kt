@@ -31,7 +31,8 @@ const val defaultSalePrice = 4500.0
 
 val defaultExternalLinks = mutableMapOf(
     MappingType.ALADIN to BookExternalLink(defaultLinkUri, defaultOriginalPrice, defaultSalePrice),
-    MappingType.KYOBO to BookExternalLink(defaultLinkUri, defaultOriginalPrice, defaultSalePrice)
+    MappingType.KYOBO to BookExternalLink(defaultLinkUri, defaultOriginalPrice, defaultSalePrice),
+    MappingType.NATIONAL_LIBRARY to BookExternalLink(defaultLinkUri, defaultOriginalPrice, defaultSalePrice)
 )
 
 var bookAssertIgnoreFields = listOf(Book::createdAt.name, Book::updatedAt.name).toTypedArray()
