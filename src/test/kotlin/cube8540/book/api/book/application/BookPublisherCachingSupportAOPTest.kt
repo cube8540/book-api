@@ -1,53 +1,50 @@
 package cube8540.book.api.book.application
 
+import cube8540.book.api.book.domain.createPublisher
+import cube8540.book.api.book.repository.PublisherContainer
+import cube8540.book.api.book.repository.PublisherContainerHolder
 import cube8540.book.api.book.repository.PublisherRepository
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.slot
+import io.mockk.verify
+import org.aspectj.lang.ProceedingJoinPoint
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
-import kotlin.random.Random
 
 internal class BookPublisherCachingSupportAOPTest {
 
     private val publisherRepository: PublisherRepository = mockk(relaxed = true)
-    private val aop = BookPublisherCachingSupportAOP()
 
-    init {
-        aop.publisherRepository = publisherRepository
-    }
+    private val aop =  BookPublisherCachingSupportAOP(publisherRepository)
 
     @Test
-    fun `caching publisher before book upsert`() {
-        val upsertRequests = listOf(
-            createBookPostRequest(isbn = "isbn0000", publisherCode = "publisher0000"),
-            createBookPostRequest(isbn = "isbn0001", publisherCode = "publisher0001"),
-            createBookPostRequest(isbn = "isbn0002", publisherCode = "publisher0002")
+    fun `caching requested publishers`() {
+        val requests = listOf(
+            createBookPostRequest(isbn = "isbn00000", publisherCode = "code00000"),
+            createBookPostRequest(isbn = "isbn00001", publisherCode = "code00001"),
+            createBookPostRequest(isbn = "isbn00002", publisherCode = "code00002")
         )
-        val publisherCaptor = slot<List<String>>()
+        val storedPublishers = listOf(createPublisher(code = "code00000"), createPublisher(code = "code00001"), createPublisher(code = "code00002"))
+        val requestPublisherCodes = requests.map { it.publisherCode }
+        val proceedingJoinPoint: ProceedingJoinPoint = mockk(relaxed = true)
 
-        every { publisherRepository.findAllById(capture(publisherCaptor)) } returns emptyList()
+        val container: PublisherContainer = mockk(relaxed = true)
 
-        aop.cachingPublisherBeforeBookUpsert(upsertRequests)
-        assertThat(publisherCaptor.captured)
-            .containsExactly("publisher0000", "publisher0001", "publisher0002")
+        PublisherContainerHolder.setContainer(container)
+        every { publisherRepository.findAllById(requestPublisherCodes) } returns storedPublishers
+        every { proceedingJoinPoint.proceed() } returns Any()
+
+        aop.cachingPublisherBeforeBookUpsert(proceedingJoinPoint, requests)
+        verify {
+            container.storeAll(storedPublishers)
+            proceedingJoinPoint.proceed()
+        }
+        assertThat(PublisherContainerHolder.getContainer().isEmpty()).isTrue
     }
 
-    @Test
-    fun `caching publisher before book upsert when request publisher code count is grater then chunk`() {
-        val randomChunk = Random.nextInt(100, 500)
-        val upsertRequests = (0 until (randomChunk * 3)).map { createBookPostRequest(isbn = "isbn-$it", publisherCode = "publisher-$it") }
-        val publisherCaptor = ArrayList<List<String>>()
-
-        aop.chunkSize = randomChunk
-        every { publisherRepository.findAllById(capture(publisherCaptor)) } returns emptyList()
-
-        aop.cachingPublisherBeforeBookUpsert(upsertRequests)
-        assertThat(publisherCaptor).hasSize(3)
-            .containsExactly(
-                (0 until randomChunk).map { "publisher-$it" }.toList(),
-                (randomChunk until (randomChunk * 2)).map { "publisher-$it" }.toList(),
-                ((randomChunk * 2) until (randomChunk * 3)).map { "publisher-$it" }.toList()
-            )
+    @AfterEach
+    fun afterEach() {
+        PublisherContainerHolder.clearContainer()
     }
 }
