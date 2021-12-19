@@ -1,12 +1,12 @@
 package cube8540.book.api.book.infra
 
-import cube8540.book.api.book.application.PublisherDetailsService
 import cube8540.book.api.book.domain.Book
 import cube8540.book.api.book.domain.BookValidatorFactory
+import cube8540.book.api.book.repository.PublisherContainer
+import cube8540.book.api.book.repository.PublisherContainerHolder
 import io.github.cube8540.validator.core.ValidationError
 import io.github.cube8540.validator.core.ValidationRule
 import io.github.cube8540.validator.core.Validator
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 class DefaultBookIsbnValidationRule(private val property: String, private val message: String): ValidationRule<Book> {
@@ -31,11 +31,11 @@ class DefaultBookPublisherValidationRule(private val property: String, private v
         private const val defaultMessage = "등록 되지 않은 출판사 입니다."
     }
 
-    lateinit var publisherDetailsService: PublisherDetailsService
+    lateinit var container: PublisherContainer
 
     constructor(): this(defaultProperty, defaultMessage)
 
-    override fun isValid(target: Book): Boolean = publisherDetailsService.existsPublisher(target.publisher.code)
+    override fun isValid(target: Book): Boolean = container.getPublisher(target.publisher.code)?.let { true } ?: false
 
     override fun error(): ValidationError = ValidationError(property, message)
 }
@@ -58,12 +58,9 @@ class DefaultBookSeriesValidationRule(private val property: String, private val 
 @Component
 class DefaultBookValidatorFactory: BookValidatorFactory {
 
-    @set:Autowired
-    lateinit var publisherDetailsService: PublisherDetailsService
-
     override fun createValidator(book: Book): Validator<Book> {
         val publisherValidationRule = DefaultBookPublisherValidationRule()
-        publisherValidationRule.publisherDetailsService = publisherDetailsService
+        publisherValidationRule.container = PublisherContainerHolder.getContainer()
 
         return Validator.of(book).registerRule(DefaultBookIsbnValidationRule())
             .registerRule(DefaultBookSeriesValidationRule())
