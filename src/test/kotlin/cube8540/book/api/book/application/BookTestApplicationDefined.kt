@@ -1,6 +1,5 @@
 package cube8540.book.api.book.application
 
-import cube8540.book.api.book.domain.BookExternalLink
 import cube8540.book.api.book.domain.MappingType
 import cube8540.book.api.book.domain.createSeries
 import cube8540.book.api.book.domain.createThumbnail
@@ -30,7 +29,8 @@ val defaultPublishTo: LocalDate = LocalDate.of(2021, 6, 30)
 
 val defaultExternalLinkPostRequest = mutableMapOf(
     MappingType.ALADIN to createBookExternalLinkPostRequest(),
-    MappingType.KYOBO to createBookExternalLinkPostRequest()
+    MappingType.KYOBO to createBookExternalLinkPostRequest(),
+    MappingType.NATIONAL_LIBRARY to createBookExternalLinkPostRequest()
 )
 
 val bookDetailsAssertIgnoreFields = listOf(BookDetail::createdAt.name, BookDetail::updatedAt.name).toTypedArray()

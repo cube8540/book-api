@@ -72,3 +72,9 @@ tasks.withType<KotlinCompile> {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+task("printVersion") {
+    doLast {
+        print(project.version)
+    }
+}
